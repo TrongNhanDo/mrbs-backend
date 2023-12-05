@@ -1,11 +1,11 @@
 const dbConnect = require('../config/poolConnection');
 
-const getAllUsers = (req, res) => {
+const getAllRooms = (req, res) => {
    try {
       dbConnect.getConnection((err, connection) => {
          if (err) throw err;
 
-         connection.query('SELECT * from mrbs_users', (err, rows) => {
+         connection.query('SELECT * from mrbs_room', (err, rows) => {
             connection.release();
             if (!err) {
                return res.json({
@@ -21,22 +21,37 @@ const getAllUsers = (req, res) => {
          });
       });
    } catch (error) {
-      throw error;
+      return res.json({
+         errors: error,
+      });
    }
 };
 
-const addUser = (req, res) => {
+const addRoom = (req, res) => {
    try {
       dbConnect.getConnection((err, connection) => {
          if (err) throw err;
 
-         const { level, name, display_name, password_hash, email, last_login } =
-            req.body;
+         const {
+            room_name,
+            sort_key,
+            area_id,
+            description,
+            capacity,
+            room_admin_email,
+         } = req.body;
          const query =
-            'INSERT INTO mrbs_users (level, name, display_name, password_hash, email, last_login) VALUES (?,?,?,?,?,?)';
+            'INSERT INTO mrbs_room (room_name, sort_key, area_id, description, capacity, room_admin_email) VALUES (?,?,?,?,?,?)';
          connection.query(
             query,
-            [level, name, display_name, password_hash, email, last_login],
+            [
+               room_name,
+               sort_key,
+               area_id,
+               description,
+               capacity,
+               room_admin_email,
+            ],
             (err, rows) => {
                connection.release();
                if (!err) {
@@ -59,17 +74,37 @@ const addUser = (req, res) => {
    }
 };
 
-const updateUser = (req, res) => {
+const updateRoom = (req, res) => {
    try {
       dbConnect.getConnection((err, connection) => {
          if (err) throw err;
 
-         const { id, level, display_name, password_hash, email } = req.body;
+         const {
+            disabled,
+            area_id,
+            room_name,
+            sort_key,
+            description,
+            capacity,
+            room_admin_email,
+            invalid_types,
+            id,
+         } = req.body;
          const query =
-            'UPDATE mrbs_users SET level = ?, display_name = ?, password_hash = ?, email = ? WHERE id = ?';
+            'UPDATE mrbs_room SET disabled = ?, area_id = ?, room_name = ?, sort_key = ?, description = ?, capacity = ?, room_admin_email = ?, invalid_types = ? WHERE id = ?';
          connection.query(
             query,
-            [level, display_name, password_hash, email, id],
+            [
+               disabled,
+               area_id,
+               room_name,
+               sort_key,
+               description,
+               capacity,
+               room_admin_email,
+               invalid_types,
+               id,
+            ],
             (err, rows) => {
                connection.release();
 
@@ -94,13 +129,13 @@ const updateUser = (req, res) => {
    }
 };
 
-const deleteUser = (req, res) => {
+const deleteRoom = (req, res) => {
    try {
       const { id } = req.body;
       dbConnect.getConnection((err, connection) => {
          if (err) throw err;
 
-         const query = 'DELETE FROM mrbs_users WHERE id = ?';
+         const query = 'DELETE FROM mrbs_room WHERE id = ?';
          connection.query(query, [id], (err, rows) => {
             connection.release();
             if (!err) {
@@ -122,8 +157,8 @@ const deleteUser = (req, res) => {
 };
 
 module.exports = {
-   getAllUsers,
-   addUser,
-   updateUser,
-   deleteUser,
+   getAllRooms,
+   addRoom,
+   updateRoom,
+   deleteRoom,
 };

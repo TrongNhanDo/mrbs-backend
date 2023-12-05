@@ -1,11 +1,11 @@
 const dbConnect = require('../config/poolConnection');
 
-const getAllUsers = (req, res) => {
+const getAllParticipants = (req, res) => {
    try {
       dbConnect.getConnection((err, connection) => {
          if (err) throw err;
 
-         connection.query('SELECT * from mrbs_users', (err, rows) => {
+         connection.query('SELECT * FROM mrbs_participants', (error, rows) => {
             connection.release();
             if (!err) {
                return res.json({
@@ -25,18 +25,17 @@ const getAllUsers = (req, res) => {
    }
 };
 
-const addUser = (req, res) => {
+const addParticipant = (req, res) => {
    try {
       dbConnect.getConnection((err, connection) => {
          if (err) throw err;
 
-         const { level, name, display_name, password_hash, email, last_login } =
-            req.body;
+         const { entry_id, username, create_by, registered } = req.body;
          const query =
-            'INSERT INTO mrbs_users (level, name, display_name, password_hash, email, last_login) VALUES (?,?,?,?,?,?)';
+            'INSERT INTO mrbs_users (entry_id, username, create_by, registered) VALUES (?,?,?,?)';
          connection.query(
             query,
-            [level, name, display_name, password_hash, email, last_login],
+            [entry_id, username, create_by, registered],
             (err, rows) => {
                connection.release();
                if (!err) {
@@ -59,33 +58,29 @@ const addUser = (req, res) => {
    }
 };
 
-const updateUser = (req, res) => {
+const updateParticipant = (req, res) => {
    try {
       dbConnect.getConnection((err, connection) => {
          if (err) throw err;
 
-         const { id, level, display_name, password_hash, email } = req.body;
+         const { old_id, new_id } = req.body;
          const query =
-            'UPDATE mrbs_users SET level = ?, display_name = ?, password_hash = ?, email = ? WHERE id = ?';
-         connection.query(
-            query,
-            [level, display_name, password_hash, email, id],
-            (err, rows) => {
-               connection.release();
+            'UPDATE mrbs_participants SET entry_id = ? WHERE entry_id = ?';
+         connection.query(query, [old_id, new_id], (err, rows) => {
+            connection.release();
 
-               if (!err) {
-                  return res.json({
-                     message: `Update successfully!`,
-                     bizResult: '0',
-                  });
-               } else {
-                  return res.json({
-                     bizResult: '8',
-                     errors: err,
-                  });
-               }
+            if (!err) {
+               return res.json({
+                  message: `Update successfully!`,
+                  bizResult: '0',
+               });
+            } else {
+               return res.json({
+                  bizResult: '8',
+                  errors: err,
+               });
             }
-         );
+         });
 
          console.log(req.body);
       });
@@ -94,13 +89,13 @@ const updateUser = (req, res) => {
    }
 };
 
-const deleteUser = (req, res) => {
+const deleteParticipant = (req, res) => {
    try {
       const { id } = req.body;
       dbConnect.getConnection((err, connection) => {
          if (err) throw err;
 
-         const query = 'DELETE FROM mrbs_users WHERE id = ?';
+         const query = 'DELETE FROM mrbs_participants WHERE id = ?';
          connection.query(query, [id], (err, rows) => {
             connection.release();
             if (!err) {
@@ -122,8 +117,8 @@ const deleteUser = (req, res) => {
 };
 
 module.exports = {
-   getAllUsers,
-   addUser,
-   updateUser,
-   deleteUser,
+   getAllParticipants,
+   addParticipant,
+   updateParticipant,
+   deleteParticipant,
 };
