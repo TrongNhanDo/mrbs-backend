@@ -1,6 +1,6 @@
 const dbConnect = require('../config/poolConnection');
 const Constants = require('../common/constants');
-const moment = require('moment');
+const Utils = require('../common/utils');
 
 /** Controller uses for getting all entries registered. */
 const getAllEntries = (req, res) => {
@@ -16,6 +16,12 @@ const getAllEntries = (req, res) => {
             (error, rows) => {
                connection.release();
                if (!error) {
+                  rows.map((value) => {
+                     console.log({
+                        start: Utils.uniTimeToDate(value.start_time),
+                        end: Utils.uniTimeToDate(value.end_time),
+                     });
+                  });
                   return res.json({
                      returnCnt: rows ? rows.length : 0,
                      entries: rows || [],
@@ -72,10 +78,12 @@ const addEntryNoRepeat = (params, res, connection) => {
 
    params.room_id.map((value) => {
       const roomId = value;
+      const startTime = Utils.getUnixTime(params.start_time);
+      const endTime = Utils.getUnixTime(params.end_time);
 
       entryArray.push([
-         params.start_time,
-         params.end_time,
+         startTime,
+         endTime,
          params.entry_type || 0,
          roomId,
          params.create_by,
@@ -110,11 +118,15 @@ const addEntryRepeatDaily = (params, res, connection) => {
    const repeatArray = [];
    params.room_id.map((value) => {
       const roomId = value;
+      const startTime = Utils.getUnixTime(params.start_time);
+      const endTime = Utils.getUnixTime(params.end_time);
+      const endDate = Utils.getUnixTime(params.end_date);
+
       repeatArray.push([
-         params.start_time,
-         params.end_time,
+         startTime,
+         endTime,
          params.rep_type,
-         params.end_date,
+         endDate,
          params.rep_opt,
          roomId,
          params.create_by,
@@ -137,7 +149,8 @@ const addEntryRepeatDaily = (params, res, connection) => {
          const repeatId = Number(rows.insertId);
          const recordAdded = rows.affectedRows;
          const periodTime =
-            Number(params.end_time || 0) - Number(params.start_time || 0);
+            Utils.getUnixTime(params.end_time) -
+            Utils.getUnixTime(params.start_time);
          const queryEntry =
             'INSERT INTO mrbs_entry (start_time, end_time, entry_type, repeat_id, room_id, create_by, modified_by, name, type, description, status) VALUES ?';
          let hasError = false;
@@ -151,8 +164,14 @@ const addEntryRepeatDaily = (params, res, connection) => {
                   .map((_, index) => {
                      const startTime =
                         index === 0
-                           ? Number(params.start_time)
-                           : Number(params.start_time) + 86400 * index;
+                           ? Utils.getUnixTime(params.start_time)
+                           : Utils.getUnixTime(
+                                Utils.addDate(
+                                   index,
+                                   params.start_time,
+                                   Constants.AddDateTypes.Day
+                                )
+                             );
                      paramArray.push([
                         startTime,
                         startTime + periodTime,
@@ -271,11 +290,15 @@ const addEntryRepeatYear = (params, res, connection) => {
    const repeatArray = [];
    params.room_id.map((value) => {
       const roomId = value;
+      const startTime = Utils.getUnixTime(params.start_time);
+      const endTime = Utils.getUnixTime(params.end_time);
+      const endDate = Utils.getUnixTime(params.end_date);
+
       repeatArray.push([
-         params.start_time,
-         params.end_time,
+         startTime,
+         endTime,
          params.rep_type,
-         params.end_date,
+         endDate,
          params.rep_opt,
          roomId,
          params.create_by,
@@ -298,7 +321,8 @@ const addEntryRepeatYear = (params, res, connection) => {
          const repeatId = Number(rows.insertId);
          const recordAdded = rows.affectedRows;
          const periodTime =
-            Number(params.end_time || 0) - Number(params.start_time || 0);
+            Utils.getUnixTime(params.end_time) -
+            Utils.getUnixTime(params.start_time);
          const queryEntry =
             'INSERT INTO mrbs_entry (start_time, end_time, entry_type, repeat_id, room_id, create_by, modified_by, name, type, description, status) VALUES ?';
          let hasError = false;
@@ -312,8 +336,14 @@ const addEntryRepeatYear = (params, res, connection) => {
                   .map((_, index) => {
                      const startTime =
                         index === 0
-                           ? Number(params.start_time)
-                           : Number(params.start_time) + 86400 * index;
+                           ? Utils.getUnixTime(params.start_time)
+                           : Utils.getUnixTime(
+                                Utils.addDate(
+                                   index,
+                                   params.start_time,
+                                   Constants.AddDateTypes.Year
+                                )
+                             );
                      paramArray.push([
                         startTime,
                         startTime + periodTime,
