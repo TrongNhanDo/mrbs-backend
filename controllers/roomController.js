@@ -32,25 +32,18 @@ const addRoom = (req, res) => {
       dbConnect.getConnection((err, connection) => {
          if (err) throw err;
 
-         const {
-            room_name,
-            sort_key,
-            area_id,
-            description,
-            capacity,
-            room_admin_email,
-         } = req.body;
+         const params = req.body;
          const query =
             'INSERT INTO mrbs_room (room_name, sort_key, area_id, description, capacity, room_admin_email) VALUES (?,?,?,?,?,?)';
          connection.query(
             query,
             [
-               room_name,
-               sort_key,
-               area_id,
-               description,
-               capacity,
-               room_admin_email,
+               params.room_name,
+               params.sort_key,
+               params.area_id,
+               params.description,
+               params.capacity,
+               params.room_admin_email,
             ],
             (err, rows) => {
                connection.release();
@@ -79,35 +72,24 @@ const updateRoom = (req, res) => {
       dbConnect.getConnection((err, connection) => {
          if (err) throw err;
 
-         const {
-            disabled,
-            area_id,
-            room_name,
-            sort_key,
-            description,
-            capacity,
-            room_admin_email,
-            invalid_types,
-            id,
-         } = req.body;
+         const params = req.body;
          const query =
             'UPDATE mrbs_room SET disabled = ?, area_id = ?, room_name = ?, sort_key = ?, description = ?, capacity = ?, room_admin_email = ?, invalid_types = ? WHERE id = ?';
          connection.query(
             query,
             [
-               disabled,
-               area_id,
-               room_name,
-               sort_key,
-               description,
-               capacity,
-               room_admin_email,
-               invalid_types,
-               id,
+               params.disabled,
+               params.area_id,
+               params.room_name,
+               params.sort_key,
+               params.description,
+               params.capacity,
+               params.room_admin_email,
+               params.invalid_types,
+               params.id,
             ],
             (err, rows) => {
                connection.release();
-
                if (!err) {
                   return res.json({
                      message: `Update successfully!`,
