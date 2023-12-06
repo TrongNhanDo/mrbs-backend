@@ -1,0 +1,18 @@
+add entries:
+{
+   "rep_type": 0,
+   "rep_interval": 0,
+   "room_id": [1],
+   "start_time": "2023-12-06T12:00:00.000Z",
+   "end_time": "2023-12-06T12:30:00.000Z",
+   "end_date": "2023-12-07T12:00:00.000Z",
+   "entry_type": 0,
+   "create_by": "NHAN",
+   "modified_by": "",
+   "name": "dtnhan15102000",
+   "type": 0,
+   "description": "description",
+   "status": 0,
+   "rep_opt": "010101",
+   "id": 54
+}
