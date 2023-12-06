@@ -86,8 +86,6 @@ const updateUser = (req, res) => {
                }
             }
          );
-
-         console.log(req.body);
       });
    } catch (error) {
       throw error;

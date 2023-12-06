@@ -6,6 +6,7 @@ require('dotenv').config();
 const userRoute = require('./routes/userRoute');
 const roomRoute = require('./routes/roomRoute');
 const participantRoute = require('./routes/participantRoute');
+const entryRoute = require('./routes/entryRoute');
 
 const app = express(cors);
 
@@ -26,7 +27,10 @@ app.use('/api/users/', userRoute);
 app.use('/api/rooms/', roomRoute);
 
 // route for participant table
-app.use('/api/participants', participantRoute);
+app.use('/api/participants/', participantRoute);
+
+// route for entry table
+app.use('/api/entries/', entryRoute);
 
 server.listen(port, () => {
    console.log(`Server is running on port ${port}`);
