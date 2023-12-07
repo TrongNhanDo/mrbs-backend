@@ -50,9 +50,58 @@ const addDate = (number, date, type) => {
    }
 };
 
+const getAllDayOfWeek = (date, day) => {
+   let d = new Date(date);
+   let month = d.getMonth();
+   let dayArray = [];
+   // start on the first day
+   d.setDate(1);
+
+   let dayOfWeek = 0;
+   switch (day) {
+      case Constants.DayOfWeekTypes.Monday:
+         dayOfWeek = 1;
+         break;
+      case Constants.DayOfWeekTypes.Tuesday:
+         dayOfWeek = 2;
+         break;
+      case Constants.DayOfWeekTypes.Wednesday:
+         dayOfWeek = 3;
+         break;
+      case Constants.DayOfWeekTypes.Thursday:
+         dayOfWeek = 4;
+         break;
+      case Constants.DayOfWeekTypes.Friday:
+         dayOfWeek = 5;
+         break;
+      case Constants.DayOfWeekTypes.Saturday:
+         dayOfWeek = 6;
+         break;
+      case Constants.DayOfWeekTypes.Sunday:
+         dayOfWeek = 0;
+         break;
+      default:
+         dayOfWeek = 0;
+   }
+
+   // Get the first day in the month
+   while (d.getDay() !== dayOfWeek) {
+      d.setDate(d.getDate() + 1);
+   }
+
+   // Get all the other days in the month
+   while (d.getMonth() === month) {
+      dayArray.push(new Date(d.getTime()));
+      d.setDate(d.getDate() + 7);
+   }
+
+   return dayArray;
+};
+
 module.exports = {
    checkEmpty,
    getUnixTime,
    uniTimeToDate,
    addDate,
+   getAllDayOfWeek,
 };
