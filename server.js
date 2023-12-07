@@ -1,5 +1,6 @@
 const express = require('express');
 const http = require('node:http');
+const path = require('node:path');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 require('dotenv').config();
@@ -17,7 +18,7 @@ const server = http.createServer(app);
 const port = process.env.PORT;
 
 app.get('/', (req, res) => {
-   res.send('Welcome to my nodejs project!');
+   res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
 // route for user table
