@@ -145,7 +145,7 @@ const addEntryRepeatDaily = (params, res, connection) => {
    connection.query(queryRepeat, [repeatArray], (error, rows) => {
       connection.release();
       if (!error) {
-         const repeatDay = Number(params.rep_interval || 0);
+         const repeatDay = Number(params.rep_interval) + 1;
          const repeatId = Number(rows.insertId);
          const recordAdded = rows.affectedRows;
          const periodTime =
@@ -247,7 +247,7 @@ const addEntryRepeatWeek = (params, res, connection) => {
    connection.query(queryRepeat, [repeatArray], (error, rows) => {
       connection.release();
       if (!error) {
-         const repeatYear = Number(params.rep_interval || 0);
+         const repeatYear = Number(params.rep_interval) + 1;
          const repeatId = Number(rows.insertId);
          const recordAdded = rows.affectedRows;
          const periodTime =
@@ -349,7 +349,7 @@ const addEntryRepeatMonth = (params, res, connection) => {
    connection.query(queryRepeat, [repeatArray], (error, rows) => {
       connection.release();
       if (!error) {
-         const repeatYear = Number(params.rep_interval || 0);
+         const repeatYear = Number(params.rep_interval) + 1;
          const repeatId = Number(rows.insertId);
          const recordAdded = rows.affectedRows;
          const periodTime =
@@ -451,7 +451,7 @@ const addEntryRepeatYear = (params, res, connection) => {
    connection.query(queryRepeat, [repeatArray], (error, rows) => {
       connection.release();
       if (!error) {
-         const repeatYear = Number(params.rep_interval || 0);
+         const repeatYear = Number(params.rep_interval) + 1;
          const repeatId = Number(rows.insertId);
          const recordAdded = rows.affectedRows;
          const periodTime =
