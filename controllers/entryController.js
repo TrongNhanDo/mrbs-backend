@@ -16,12 +16,6 @@ const getAllEntries = (req, res) => {
             (error, rows) => {
                connection.release();
                if (!error) {
-                  rows.map((value) => {
-                     console.log({
-                        start: Utils.uniTimeToDate(value.start_time),
-                        end: Utils.uniTimeToDate(value.end_time),
-                     });
-                  });
                   return res.json({
                      returnCnt: rows ? rows.length : 0,
                      entries: rows || [],
