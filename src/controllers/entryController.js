@@ -100,14 +100,14 @@ const addEntryNoRepeat = (params, res, connection) => {
       'INSERT INTO mrbs_entry (start_time, end_time, entry_type, room_id, create_by, modified_by, name, type, description, status) VALUES ?';
    connection.query(query, [entryArray], (error) => {
       if (!error) {
-         connection.rollback();
+         connection.release();
          return res.json({
             message: 'Add entry successfully!',
             bizResult: Constants.BizResult.Success,
          });
       }
 
-      connection.release();
+      connection.rollback();
       return res.json({
          errors: error,
          bizResult: Constants.BizResult.Fail,
@@ -263,7 +263,8 @@ const addEntryRepeatWeek = (params, res, connection) => {
       'INSERT INTO mrbs_repeat (start_time, end_time, rep_type, end_date, rep_opt, room_id, create_by, modified_by, name, type, description, rep_interval, status, ical_uid, ical_sequence, month_absolute, month_relative) VALUES ?';
    connection.query(queryRepeat, [repeatArray], (error, rows) => {
       if (!error) {
-         const repeatYear = Number(params.rep_interval) + 1;
+         const repeatWeek = Number(params.rep_interval) + 1;
+         const repeatDay = params.rep_day;
          const repeatId = Number(rows.insertId);
          const recordAdded = rows.affectedRows;
          const periodTime =
@@ -276,32 +277,48 @@ const addEntryRepeatWeek = (params, res, connection) => {
             .fill()
             .map((_, index1) => {
                const paramArray = [];
-               Array(repeatYear)
+               Array(repeatWeek)
                   .fill(0)
                   .map((_, index) => {
-                     const startTime =
-                        index === 0
-                           ? Utils.getUnixTime(params.start_time)
-                           : Utils.getUnixTime(
-                                Utils.addDate(
-                                   index,
-                                   params.start_time,
-                                   Constants.AddDateTypes.Week
-                                )
-                             );
-                     paramArray.push([
-                        startTime,
-                        startTime + periodTime,
-                        params.entry_type,
-                        repeatId + index1,
-                        params.room_id[index1],
-                        params.create_by,
-                        params.modified_by || '',
-                        params.name,
-                        params.type,
-                        params.description,
-                        params.status || 0,
-                     ]);
+                     let targetDates = [];
+                     if (index === 0) {
+                        const week = Utils.getWeekByDate(params.start_time);
+                        targetDates = week.filter(
+                           (value) =>
+                              !Utils.isBeforeDate(value, params.start_time) &&
+                              repeatDay.includes(value.getDay())
+                        );
+                     } else {
+                        const week = Utils.getWeekByDate(
+                           Utils.addDate(
+                              index,
+                              params.start_time,
+                              Constants.AddDateTypes.Week
+                           )
+                        );
+                        targetDates = week.filter((value) =>
+                           repeatDay.includes(value.getDay())
+                        );
+                     }
+
+                     if (targetDates && targetDates.length > 0) {
+                        targetDates.map((value) => {
+                           const unixTime = Utils.getUnixTime(value);
+                           paramArray.push([
+                              unixTime,
+                              unixTime + periodTime,
+                              params.entry_type,
+                              repeatId + index1,
+                              params.room_id[index1],
+                              params.create_by,
+                              params.modified_by || '',
+                              params.name,
+                              params.type,
+                              params.description,
+                              params.status || 0,
+                           ]);
+                        });
+                     }
                   });
 
                const queryEntry =
@@ -387,7 +404,7 @@ const addEntryRepeatMonth = (params, res, connection) => {
       'INSERT INTO mrbs_repeat (start_time, end_time, rep_type, end_date, rep_opt, room_id, create_by, modified_by, name, type, description, rep_interval, status, ical_uid, ical_sequence, month_absolute, month_relative) VALUES ?';
    connection.query(queryRepeat, [repeatArray], (error, rows) => {
       if (!error) {
-         const repeatYear = Number(params.rep_interval) + 1;
+         const repeatMonth = Number(params.rep_interval) + 1;
          const repeatId = Number(rows.insertId);
          const recordAdded = rows.affectedRows;
          const periodTime =
@@ -402,7 +419,7 @@ const addEntryRepeatMonth = (params, res, connection) => {
             .fill()
             .map((_, index1) => {
                const paramArray = [];
-               Array(repeatYear)
+               Array(repeatMonth)
                   .fill(0)
                   .map((_, index) => {
                      let startTime = '';

@@ -120,6 +120,30 @@ const isValidDate = (date) => {
    return check;
 };
 
+const getWeekByDate = (date) => {
+   var week = [];
+   const current = date ? new Date(date) : new Date();
+   // Starting Sunday (Monday => first + 1)
+   current.setDate(current.getDate() - current.getDay());
+   for (var i = 0; i < 7; i++) {
+      week.push(new Date(current));
+      current.setDate(current.getDate() + 1);
+   }
+   return week;
+};
+
+const isBeforeDate = (date, dateCompare) => {
+   return DateFns.isBefore(new Date(date), new Date(dateCompare));
+};
+
+const isAfterDate = (date, dateCompare) => {
+   return DateFns.isAfter(new Date(date), new Date(dateCompare));
+};
+
+const isEqualDate = (date, dateCompare) => {
+   return new Date(date) === new Date(dateCompare);
+};
+
 module.exports = {
    checkEmpty,
    getUnixTime,
@@ -127,4 +151,8 @@ module.exports = {
    addDate,
    getAllDayOfWeek,
    isValidDate,
+   getWeekByDate,
+   isBeforeDate,
+   isAfterDate,
+   isEqualDate,
 };
