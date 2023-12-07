@@ -5,20 +5,23 @@ const getAllUsers = (req, res) => {
       dbConnect.getConnection((err, connection) => {
          if (err) throw err;
 
-         connection.query('SELECT * from mrbs_users', (err, rows) => {
-            connection.release();
-            if (!err) {
-               return res.json({
-                  data: rows || [],
-                  bizResult: '0',
-               });
-            } else {
-               return res.json({
-                  errors: err,
-                  bizResult: '8',
-               });
+         connection.query(
+            'SELECT * from mrbs_users GROUP BY level, name ORDER BY level, name',
+            (err, rows) => {
+               connection.release();
+               if (!err) {
+                  return res.json({
+                     data: rows || [],
+                     bizResult: '0',
+                  });
+               } else {
+                  return res.json({
+                     errors: err,
+                     bizResult: '8',
+                  });
+               }
             }
-         });
+         );
       });
    } catch (error) {
       throw error;

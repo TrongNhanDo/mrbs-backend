@@ -9,7 +9,7 @@ const getAllEntries = (req, res) => {
          if (err) throw err;
 
          const { entry_id, username, create_by, registered } = req.body;
-         const query = 'SELECT * FROM mrbs_entry';
+         const query = 'SELECT * FROM mrbs_entry ORDER BY start_time';
          connection.query(
             query,
             [entry_id, username, create_by, registered],
