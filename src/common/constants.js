@@ -11,13 +11,13 @@ const AddDateTypes = {
 };
 
 const DayOfWeekTypes = {
-   Monday: 'monday',
-   Tuesday: 'tuesday',
-   Wednesday: 'wednesday',
-   Thursday: 'thursday',
-   Friday: 'friday',
-   Saturday: 'saturday',
-   Sunday: 'sunday',
+   Monday: 'MO',
+   Tuesday: 'TU',
+   Wednesday: 'WE',
+   Thursday: 'TH',
+   Friday: 'FR',
+   Saturday: 'SA',
+   Sunday: 'SU',
 };
 
 module.exports = {

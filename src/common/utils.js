@@ -57,7 +57,7 @@ const getAllDayOfWeek = (date, day) => {
    // start on the first day
    d.setDate(1);
 
-   let dayOfWeek = 0;
+   let dayOfWeek = '';
    switch (day) {
       case Constants.DayOfWeekTypes.Monday:
          dayOfWeek = 1;
@@ -81,21 +81,25 @@ const getAllDayOfWeek = (date, day) => {
          dayOfWeek = 0;
          break;
       default:
-         dayOfWeek = 0;
+         dayOfWeek = '';
    }
 
-   // Get the first day in the month
-   while (d.getDay() !== dayOfWeek) {
-      d.setDate(d.getDate() + 1);
+   if (dayOfWeek !== '') {
+      // Get the first day in the month
+      while (d.getDay() !== dayOfWeek) {
+         d.setDate(d.getDate() + 1);
+      }
+
+      // Get all the other days in the month
+      while (d.getMonth() === month) {
+         dayArray.push(new Date(d.getTime()));
+         d.setDate(d.getDate() + 7);
+      }
+
+      return dayArray;
    }
 
-   // Get all the other days in the month
-   while (d.getMonth() === month) {
-      dayArray.push(new Date(d.getTime()));
-      d.setDate(d.getDate() + 7);
-   }
-
-   return dayArray;
+   return [];
 };
 
 module.exports = {
