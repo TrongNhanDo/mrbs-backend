@@ -89,7 +89,7 @@ const addEntryNoRepeat = (params, res, connection) => {
       ]);
    });
 
-   connection.query(query, [entryArray], (error, rows) => {
+   connection.query(query, [entryArray], (error) => {
       connection.release();
       if (!error) {
          return res.json({
@@ -180,7 +180,7 @@ const addEntryRepeatDaily = (params, res, connection) => {
                         params.status || 0,
                      ]);
                   });
-               connection.query(queryEntry, [paramArray], (err2, rows2) => {
+               connection.query(queryEntry, [paramArray], (err2) => {
                   if (err2) {
                      hasError = true;
                   }
@@ -282,7 +282,7 @@ const addEntryRepeatWeek = (params, res, connection) => {
                         params.status || 0,
                      ]);
                   });
-               connection.query(queryEntry, [paramArray], (err2, rows2) => {
+               connection.query(queryEntry, [paramArray], (err2) => {
                   if (err2) {
                      hasError = true;
                   }
@@ -384,7 +384,7 @@ const addEntryRepeatMonth = (params, res, connection) => {
                         params.status || 0,
                      ]);
                   });
-               connection.query(queryEntry, [paramArray], (err2, rows2) => {
+               connection.query(queryEntry, [paramArray], (err2) => {
                   if (err2) {
                      hasError = true;
                   }
@@ -486,7 +486,7 @@ const addEntryRepeatYear = (params, res, connection) => {
                         params.status || 0,
                      ]);
                   });
-               connection.query(queryEntry, [paramArray], (err2, rows2) => {
+               connection.query(queryEntry, [paramArray], (err2) => {
                   if (err2) {
                      hasError = true;
                   }
@@ -537,7 +537,7 @@ const updateEntry = (req, res) => {
                   params.status,
                   params.id,
                ],
-               (err, rows) => {
+               (err) => {
                   connection.release();
                   if (err) {
                      hasError = true;
@@ -576,7 +576,7 @@ const deleteEntry = (req, res) => {
 
          if (params.entry_id) {
             const query = 'DELETE FROM mrbs_entry WHERE id = ?';
-            connection.query(query, [params.entry_id], (error, rows) => {
+            connection.query(query, [params.entry_id], (error) => {
                connection.release();
                if (!err) {
                   res.json({
@@ -593,7 +593,7 @@ const deleteEntry = (req, res) => {
          } else if (params.repeat_id) {
             const query =
                'DELETE a, b FROM mrbs_repeat a LEFT JOIN mrbs_entry b ON a.id = b.repeat_id WHERE a.id = ?';
-            connection.query(query, [params.repeat_id], (error, rows) => {
+            connection.query(query, [params.repeat_id], (error) => {
                connection.release();
                if (!err) {
                   res.json({

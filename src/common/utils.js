@@ -1,5 +1,5 @@
 const DateFns = require('date-fns');
-const Constants = require('../common/constants');
+const Constants = require('./constants');
 
 const checkEmpty = (value) => {
    if (value) {

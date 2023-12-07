@@ -15,5 +15,6 @@ module.exports = {
          'warn',
          { vars: 'all', args: 'after-used', ignoreRestSiblings: false },
       ],
+      'no-useless-catch': ['off'],
    },
 };

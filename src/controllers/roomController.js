@@ -1,11 +1,11 @@
 const dbConnect = require('../config/poolConnection');
 
-const getAllParticipants = (req, res) => {
+const getAllRooms = (req, res) => {
    try {
       dbConnect.getConnection((err, connection) => {
          if (err) throw err;
 
-         connection.query('SELECT * FROM mrbs_participants', (error, rows) => {
+         connection.query('SELECT * from mrbs_room', (err, rows) => {
             connection.release();
             if (!err) {
                return res.json({
@@ -21,21 +21,30 @@ const getAllParticipants = (req, res) => {
          });
       });
    } catch (error) {
-      throw error;
+      return res.json({
+         errors: error,
+      });
    }
 };
 
-const addParticipant = (req, res) => {
+const addRoom = (req, res) => {
    try {
       dbConnect.getConnection((err, connection) => {
          if (err) throw err;
 
-         const { entry_id, username, create_by, registered } = req.body;
+         const params = req.body;
          const query =
-            'INSERT INTO mrbs_users (entry_id, username, create_by, registered) VALUES (?,?,?,?)';
+            'INSERT INTO mrbs_room (room_name, sort_key, area_id, description, capacity, room_admin_email) VALUES (?,?,?,?,?,?)';
          connection.query(
             query,
-            [entry_id, username, create_by, registered],
+            [
+               params.room_name,
+               params.sort_key,
+               params.area_id,
+               params.description,
+               params.capacity,
+               params.room_admin_email,
+            ],
             (err, rows) => {
                connection.release();
                if (!err) {
@@ -58,43 +67,56 @@ const addParticipant = (req, res) => {
    }
 };
 
-const updateParticipant = (req, res) => {
+const updateRoom = (req, res) => {
    try {
       dbConnect.getConnection((err, connection) => {
          if (err) throw err;
 
-         const { old_id, new_id } = req.body;
+         const params = req.body;
          const query =
-            'UPDATE mrbs_participants SET entry_id = ? WHERE entry_id = ?';
-         connection.query(query, [old_id, new_id], (err, rows) => {
-            connection.release();
-
-            if (!err) {
-               return res.json({
-                  message: `Update successfully!`,
-                  bizResult: '0',
-               });
-            } else {
-               return res.json({
-                  bizResult: '8',
-                  errors: err,
-               });
+            'UPDATE mrbs_room SET disabled = ?, area_id = ?, room_name = ?, sort_key = ?, description = ?, capacity = ?, room_admin_email = ?, invalid_types = ? WHERE id = ?';
+         connection.query(
+            query,
+            [
+               params.disabled,
+               params.area_id,
+               params.room_name,
+               params.sort_key,
+               params.description,
+               params.capacity,
+               params.room_admin_email,
+               params.invalid_types,
+               params.id,
+            ],
+            (err) => {
+               connection.release();
+               if (!err) {
+                  return res.json({
+                     message: `Update successfully!`,
+                     bizResult: '0',
+                  });
+               } else {
+                  return res.json({
+                     bizResult: '8',
+                     errors: err,
+                  });
+               }
             }
-         });
+         );
       });
    } catch (error) {
       throw error;
    }
 };
 
-const deleteParticipant = (req, res) => {
+const deleteRoom = (req, res) => {
    try {
       const { id } = req.body;
       dbConnect.getConnection((err, connection) => {
          if (err) throw err;
 
-         const query = 'DELETE FROM mrbs_participants WHERE id = ?';
-         connection.query(query, [id], (err, rows) => {
+         const query = 'DELETE FROM mrbs_room WHERE id = ?';
+         connection.query(query, [id], (err) => {
             connection.release();
             if (!err) {
                res.json({
@@ -115,8 +137,8 @@ const deleteParticipant = (req, res) => {
 };
 
 module.exports = {
-   getAllParticipants,
-   addParticipant,
-   updateParticipant,
-   deleteParticipant,
+   getAllRooms,
+   addRoom,
+   updateRoom,
+   deleteRoom,
 };
