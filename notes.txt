@@ -1,4 +1,3 @@
-add entries:
 {
    "rep_type": 0,
    "rep_interval": 0,
@@ -7,12 +6,16 @@ add entries:
    "end_time": "2023-12-06T12:30:00.000Z",
    "end_date": "2023-12-07T12:00:00.000Z",
    "entry_type": 0,
-   "create_by": "NHAN",
+   "create_by": "dtnhan",
    "modified_by": "",
-   "name": "dtnhan15102000",
-   "type": 0,
-   "description": "description",
+   "name": "dtnhan",
+   "type": "I",
+   "description": "Do Trong Nhan",
    "status": 0,
+   "ical_uid": "",
+   "ical_sequence": "",
+   "month_absolute": "",
+   "month_relative": "",
    "rep_opt": "010101",
    "id": 54
 }
