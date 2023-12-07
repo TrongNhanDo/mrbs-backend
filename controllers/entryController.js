@@ -570,24 +570,48 @@ const updateEntry = (req, res) => {
 /** Controller uses for delete entry */
 const deleteEntry = (req, res) => {
    try {
-      const { id } = req.body;
+      const params = req.body;
       dbConnect.getConnection((err, connection) => {
          if (err) throw err;
 
-         const query = 'DELETE FROM mrbs_entry WHERE id = ?';
-         connection.query(query, [id], (error, rows) => {
-            connection.release();
-            if (!err) {
-               res.json({
-                  message: 'Delete entry successfully!',
-                  bizResult: Constants.BizResult.Success,
-               });
-            } else {
-               res.json({
-                  errors: error,
-                  bizResult: Constants.BizResult.Fail,
-               });
-            }
+         if (params.entry_id) {
+            const query = 'DELETE FROM mrbs_entry WHERE id = ?';
+            connection.query(query, [params.entry_id], (error, rows) => {
+               connection.release();
+               if (!err) {
+                  res.json({
+                     message: 'Delete entry based on entryId successfully!',
+                     bizResult: Constants.BizResult.Success,
+                  });
+               } else {
+                  res.json({
+                     errors: error,
+                     bizResult: Constants.BizResult.Fail,
+                  });
+               }
+            });
+         } else if (params.repeat_id) {
+            const query =
+               'DELETE a, b FROM mrbs_repeat a LEFT JOIN mrbs_entry b ON a.id = b.repeat_id WHERE a.id = ?';
+            connection.query(query, [params.repeat_id], (error, rows) => {
+               connection.release();
+               if (!err) {
+                  res.json({
+                     message: 'Delete entry based on repeatId successfully!',
+                     bizResult: Constants.BizResult.Success,
+                  });
+               } else {
+                  res.json({
+                     errors: error,
+                     bizResult: Constants.BizResult.Fail,
+                  });
+               }
+            });
+         }
+
+         return res.json({
+            message: 'EntryId or RepeatId is undefined.',
+            bizResult: Constants.BizResult.Fail,
          });
       });
    } catch (error) {
