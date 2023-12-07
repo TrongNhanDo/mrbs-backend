@@ -14,7 +14,6 @@ const getAllEntries = (req, res) => {
             query,
             [entry_id, username, create_by, registered],
             (error, rows) => {
-               connection.release();
                if (!error) {
                   rows.map((value) => {
                      console.log({
@@ -22,6 +21,8 @@ const getAllEntries = (req, res) => {
                         end: Utils.uniTimeToDate(value.end_time),
                      });
                   });
+
+                  connection.release();
                   return res.json({
                      returnCnt: rows ? rows.length : 0,
                      entries: rows || [],
@@ -29,6 +30,7 @@ const getAllEntries = (req, res) => {
                   });
                }
 
+               connection.rollback();
                return res.json({
                   errors: error,
                   bizResult: Constants.BizResult.Fail,
@@ -61,7 +63,8 @@ const addEntry = (req, res) => {
                return addEntryRepeatYear(params, res, connection);
             default:
                return res.json({
-                  bizResult: Constants.BizResult.Success,
+                  message: 'rep_type is undefined.',
+                  bizResult: Constants.BizResult.Fail,
                });
          }
       });
@@ -72,8 +75,6 @@ const addEntry = (req, res) => {
 
 /** Function uses for adding entries when repeat type = 0 (None) */
 const addEntryNoRepeat = (params, res, connection) => {
-   const query =
-      'INSERT INTO mrbs_entry (start_time, end_time, entry_type, room_id, create_by, modified_by, name, type, description, status) VALUES ?';
    const entryArray = [];
 
    params.room_id.map((value) => {
@@ -95,15 +96,18 @@ const addEntryNoRepeat = (params, res, connection) => {
       ]);
    });
 
+   const query =
+      'INSERT INTO mrbs_entry (start_time, end_time, entry_type, room_id, create_by, modified_by, name, type, description, status) VALUES ?';
    connection.query(query, [entryArray], (error) => {
-      connection.release();
       if (!error) {
+         connection.rollback();
          return res.json({
             message: 'Add entry successfully!',
             bizResult: Constants.BizResult.Success,
          });
       }
 
+      connection.release();
       return res.json({
          errors: error,
          bizResult: Constants.BizResult.Fail,
@@ -113,8 +117,6 @@ const addEntryNoRepeat = (params, res, connection) => {
 
 /** Function uses for adding entries when repeat type = 1 (Daily) */
 const addEntryRepeatDaily = (params, res, connection) => {
-   const queryRepeat =
-      'INSERT INTO mrbs_repeat (start_time, end_time, rep_type, end_date, rep_opt, room_id, create_by, modified_by, name, type, description, rep_interval, status, ical_uid, ical_sequence, month_absolute, month_relative) VALUES ?';
    const repeatArray = [];
    params.room_id.map((value) => {
       const roomId = value;
@@ -142,8 +144,10 @@ const addEntryRepeatDaily = (params, res, connection) => {
          params.month_relative || null,
       ]);
    });
+
+   const queryRepeat =
+      'INSERT INTO mrbs_repeat (start_time, end_time, rep_type, end_date, rep_opt, room_id, create_by, modified_by, name, type, description, rep_interval, status, ical_uid, ical_sequence, month_absolute, month_relative) VALUES ?';
    connection.query(queryRepeat, [repeatArray], (error, rows) => {
-      connection.release();
       if (!error) {
          const repeatDay = Number(params.rep_interval) + 1;
          const repeatId = Number(rows.insertId);
@@ -151,9 +155,8 @@ const addEntryRepeatDaily = (params, res, connection) => {
          const periodTime =
             Utils.getUnixTime(params.end_time) -
             Utils.getUnixTime(params.start_time);
-         const queryEntry =
-            'INSERT INTO mrbs_entry (start_time, end_time, entry_type, repeat_id, room_id, create_by, modified_by, name, type, description, status) VALUES ?';
          let hasError = false;
+         const errorArray = [];
 
          Array(recordAdded)
             .fill()
@@ -186,25 +189,38 @@ const addEntryRepeatDaily = (params, res, connection) => {
                         params.status || 0,
                      ]);
                   });
+
+               const queryEntry =
+                  'INSERT INTO mrbs_entry (start_time, end_time, entry_type, repeat_id, room_id, create_by, modified_by, name, type, description, status) VALUES ?';
                connection.query(queryEntry, [paramArray], (err2) => {
                   if (err2) {
                      hasError = true;
+                     errorArray.push(err2);
+
+                     connection.rollback();
+                     return res.json({
+                        errors: errorArray,
+                        bizResult: Constants.BizResult.Fail,
+                     });
                   }
                });
             });
 
          if (!hasError) {
+            connection.release();
             return res.json({
                message: 'Add entry successfully!',
                bizResult: Constants.BizResult.Success,
             });
          }
 
+         connection.rollback();
          return res.json({
             errors: error,
             bizResult: Constants.BizResult.Fail,
          });
       } else {
+         connection.rollback();
          return res.json({
             errors: error,
             bizResult: Constants.BizResult.Fail,
@@ -215,8 +231,6 @@ const addEntryRepeatDaily = (params, res, connection) => {
 
 /** Function uses for adding entries when repeat type = 2 (Weekly) */
 const addEntryRepeatWeek = (params, res, connection) => {
-   const queryRepeat =
-      'INSERT INTO mrbs_repeat (start_time, end_time, rep_type, end_date, rep_opt, room_id, create_by, modified_by, name, type, description, rep_interval, status, ical_uid, ical_sequence, month_absolute, month_relative) VALUES ?';
    const repeatArray = [];
    params.room_id.map((value) => {
       const roomId = value;
@@ -244,8 +258,10 @@ const addEntryRepeatWeek = (params, res, connection) => {
          params.month_relative || null,
       ]);
    });
+
+   const queryRepeat =
+      'INSERT INTO mrbs_repeat (start_time, end_time, rep_type, end_date, rep_opt, room_id, create_by, modified_by, name, type, description, rep_interval, status, ical_uid, ical_sequence, month_absolute, month_relative) VALUES ?';
    connection.query(queryRepeat, [repeatArray], (error, rows) => {
-      connection.release();
       if (!error) {
          const repeatYear = Number(params.rep_interval) + 1;
          const repeatId = Number(rows.insertId);
@@ -253,9 +269,8 @@ const addEntryRepeatWeek = (params, res, connection) => {
          const periodTime =
             Utils.getUnixTime(params.end_time) -
             Utils.getUnixTime(params.start_time);
-         const queryEntry =
-            'INSERT INTO mrbs_entry (start_time, end_time, entry_type, repeat_id, room_id, create_by, modified_by, name, type, description, status) VALUES ?';
          let hasError = false;
+         const errorArray = [];
 
          Array(recordAdded)
             .fill()
@@ -288,25 +303,38 @@ const addEntryRepeatWeek = (params, res, connection) => {
                         params.status || 0,
                      ]);
                   });
+
+               const queryEntry =
+                  'INSERT INTO mrbs_entry (start_time, end_time, entry_type, repeat_id, room_id, create_by, modified_by, name, type, description, status) VALUES ?';
                connection.query(queryEntry, [paramArray], (err2) => {
                   if (err2) {
                      hasError = true;
+                     errorArray.push(err2);
+
+                     connection.rollback();
+                     return res.json({
+                        errors: errorArray,
+                        bizResult: Constants.BizResult.Fail,
+                     });
                   }
                });
             });
 
          if (!hasError) {
+            connection.release();
             return res.json({
                message: 'Add entry successfully!',
                bizResult: Constants.BizResult.Success,
             });
          }
 
+         connection.rollback();
          return res.json({
             errors: error,
             bizResult: Constants.BizResult.Fail,
          });
       } else {
+         connection.rollback();
          return res.json({
             errors: error,
             bizResult: Constants.BizResult.Fail,
@@ -358,7 +386,6 @@ const addEntryRepeatMonth = (params, res, connection) => {
    const queryRepeat =
       'INSERT INTO mrbs_repeat (start_time, end_time, rep_type, end_date, rep_opt, room_id, create_by, modified_by, name, type, description, rep_interval, status, ical_uid, ical_sequence, month_absolute, month_relative) VALUES ?';
    connection.query(queryRepeat, [repeatArray], (error, rows) => {
-      connection.release();
       if (!error) {
          const repeatYear = Number(params.rep_interval) + 1;
          const repeatId = Number(rows.insertId);
@@ -367,6 +394,7 @@ const addEntryRepeatMonth = (params, res, connection) => {
             Utils.getUnixTime(params.end_time) -
             Utils.getUnixTime(params.start_time);
          let hasError = false;
+         const errorArray = [];
          const startDate = new Date(params.start_time);
          startDate.setDate(1);
 
@@ -441,22 +469,32 @@ const addEntryRepeatMonth = (params, res, connection) => {
                connection.query(queryEntry, [paramArray], (err2) => {
                   if (err2) {
                      hasError = true;
+                     errorArray.push(err2);
+
+                     connection.rollback();
+                     return res.json({
+                        errors: errorArray,
+                        bizResult: Constants.BizResult.Fail,
+                     });
                   }
                });
             });
 
          if (!hasError) {
+            connection.release();
             return res.json({
                message: 'Add entry successfully!',
                bizResult: Constants.BizResult.Success,
             });
          }
 
+         connection.rollback();
          return res.json({
             errors: error,
             bizResult: Constants.BizResult.Fail,
          });
       } else {
+         connection.rollback();
          return res.json({
             errors: error,
             bizResult: Constants.BizResult.Fail,
@@ -467,8 +505,6 @@ const addEntryRepeatMonth = (params, res, connection) => {
 
 /** Function uses for adding entries when repeat type = 4 (Yearly) */
 const addEntryRepeatYear = (params, res, connection) => {
-   const queryRepeat =
-      'INSERT INTO mrbs_repeat (start_time, end_time, rep_type, end_date, rep_opt, room_id, create_by, modified_by, name, type, description, rep_interval, status, ical_uid, ical_sequence, month_absolute, month_relative) VALUES ?';
    const repeatArray = [];
    params.room_id.map((value) => {
       const roomId = value;
@@ -496,8 +532,10 @@ const addEntryRepeatYear = (params, res, connection) => {
          params.month_relative || null,
       ]);
    });
+
+   const queryRepeat =
+      'INSERT INTO mrbs_repeat (start_time, end_time, rep_type, end_date, rep_opt, room_id, create_by, modified_by, name, type, description, rep_interval, status, ical_uid, ical_sequence, month_absolute, month_relative) VALUES ?';
    connection.query(queryRepeat, [repeatArray], (error, rows) => {
-      connection.release();
       if (!error) {
          const repeatYear = Number(params.rep_interval) + 1;
          const repeatId = Number(rows.insertId);
@@ -505,9 +543,9 @@ const addEntryRepeatYear = (params, res, connection) => {
          const periodTime =
             Utils.getUnixTime(params.end_time) -
             Utils.getUnixTime(params.start_time);
-         const queryEntry =
-            'INSERT INTO mrbs_entry (start_time, end_time, entry_type, repeat_id, room_id, create_by, modified_by, name, type, description, status) VALUES ?';
+         const startDateInput = new Date(params.start_time).getDate();
          let hasError = false;
+         const errorArray = [];
 
          Array(recordAdded)
             .fill()
@@ -516,49 +554,69 @@ const addEntryRepeatYear = (params, res, connection) => {
                Array(repeatYear)
                   .fill(0)
                   .map((_, index) => {
-                     const startTime =
-                        index === 0
-                           ? Utils.getUnixTime(params.start_time)
-                           : Utils.getUnixTime(
-                                Utils.addDate(
-                                   index,
-                                   params.start_time,
-                                   Constants.AddDateTypes.Year
-                                )
-                             );
-                     paramArray.push([
-                        startTime,
-                        startTime + periodTime,
-                        params.entry_type,
-                        repeatId + index1,
-                        params.room_id[index1],
-                        params.create_by,
-                        params.modified_by || '',
-                        params.name,
-                        params.type,
-                        params.description,
-                        params.status || 0,
-                     ]);
+                     let startTime = '';
+                     if (index === 0) {
+                        startTime = Utils.getUnixTime(params.start_time);
+                     } else {
+                        const nextYear = Utils.addDate(
+                           index,
+                           params.start_time,
+                           Constants.AddDateTypes.Year
+                        );
+
+                        if (nextYear.getDate() === startDateInput) {
+                           startTime = Utils.getUnixTime(nextYear);
+                        }
+                     }
+
+                     if (startTime && startTime !== '') {
+                        paramArray.push([
+                           startTime,
+                           startTime + periodTime,
+                           params.entry_type,
+                           repeatId + index1,
+                           params.room_id[index1],
+                           params.create_by,
+                           params.modified_by || '',
+                           params.name,
+                           params.type,
+                           params.description,
+                           params.status || 0,
+                        ]);
+                     }
                   });
+
+               const queryEntry =
+                  'INSERT INTO mrbs_entry (start_time, end_time, entry_type, repeat_id, room_id, create_by, modified_by, name, type, description, status) VALUES ?';
                connection.query(queryEntry, [paramArray], (err2) => {
                   if (err2) {
                      hasError = true;
+                     errorArray.push(err2);
+
+                     connection.rollback();
+                     return res.json({
+                        errors: errorArray,
+                        bizResult: Constants.BizResult.Fail,
+                     });
                   }
                });
             });
 
          if (!hasError) {
+            connection.release();
             return res.json({
                message: 'Add entry successfully!',
                bizResult: Constants.BizResult.Success,
             });
          }
 
+         connection.rollback();
          return res.json({
             errors: error,
             bizResult: Constants.BizResult.Fail,
          });
       } else {
+         connection.rollback();
          return res.json({
             errors: error,
             bizResult: Constants.BizResult.Fail,
@@ -592,21 +650,28 @@ const updateEntry = (req, res) => {
                   params.id,
                ],
                (err) => {
-                  connection.release();
                   if (err) {
                      hasError = true;
                      errorArray.push(err);
+                     connection.rollback();
+
+                     return res.json({
+                        errors: err,
+                        bizResult: Constants.BizResult.Fail,
+                     });
                   }
                }
             );
          });
 
          if (hasError) {
+            connection.rollback();
             return res.json({
                errors: errorArray,
                bizResult: Constants.BizResult.Fail,
             });
          } else {
+            connection.release();
             return res.json({
                message: 'Update entry successfully!',
                bizResult: Constants.BizResult.Success,
@@ -631,13 +696,14 @@ const deleteEntry = (req, res) => {
          if (params.entry_id) {
             const query = 'DELETE FROM mrbs_entry WHERE id = ?';
             connection.query(query, [params.entry_id], (error) => {
-               connection.release();
                if (!err) {
+                  connection.release();
                   res.json({
                      message: 'Delete entry based on entryId successfully!',
                      bizResult: Constants.BizResult.Success,
                   });
                } else {
+                  connection.rollback();
                   res.json({
                      errors: error,
                      bizResult: Constants.BizResult.Fail,
@@ -648,13 +714,14 @@ const deleteEntry = (req, res) => {
             const query =
                'DELETE a, b FROM mrbs_repeat a LEFT JOIN mrbs_entry b ON a.id = b.repeat_id WHERE a.id = ?';
             connection.query(query, [params.repeat_id], (error) => {
-               connection.release();
                if (!err) {
+                  connection.release();
                   res.json({
                      message: 'Delete entry based on repeatId successfully!',
                      bizResult: Constants.BizResult.Success,
                   });
                } else {
+                  connection.rollback();
                   res.json({
                      errors: error,
                      bizResult: Constants.BizResult.Fail,
