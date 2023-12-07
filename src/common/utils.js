@@ -24,6 +24,10 @@ const uniTimeToDate = (unixTime) => {
 };
 
 const addDate = (number, date, type) => {
+   if (!isValidDate(date)) {
+      return new Date();
+   }
+
    switch (type) {
       case Constants.AddDateTypes.Year:
          return new Date(
@@ -46,7 +50,7 @@ const addDate = (number, date, type) => {
             new Date(date).setDate(new Date(date).getDate() + Number(number))
          );
       default:
-         return date;
+         return new Date(date);
    }
 };
 
@@ -102,10 +106,25 @@ const getAllDayOfWeek = (date, day) => {
    return [];
 };
 
+const isValidDate = (date) => {
+   let check = false;
+
+   const newDate = new Date(date);
+
+   if (isNaN(newDate)) {
+      check = false;
+   } else {
+      check = true;
+   }
+
+   return check;
+};
+
 module.exports = {
    checkEmpty,
    getUnixTime,
    uniTimeToDate,
    addDate,
    getAllDayOfWeek,
+   isValidDate,
 };

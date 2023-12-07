@@ -16,6 +16,12 @@ const getAllEntries = (req, res) => {
             (error, rows) => {
                connection.release();
                if (!error) {
+                  rows.map((value) => {
+                     console.log({
+                        start: Utils.uniTimeToDate(value.start_time),
+                        end: Utils.uniTimeToDate(value.end_time),
+                     });
+                  });
                   return res.json({
                      returnCnt: rows ? rows.length : 0,
                      entries: rows || [],
@@ -311,9 +317,18 @@ const addEntryRepeatWeek = (params, res, connection) => {
 
 /** Function uses for adding entries when repeat type = 3 (Monthly) */
 const addEntryRepeatMonth = (params, res, connection) => {
-   const queryRepeat =
-      'INSERT INTO mrbs_repeat (start_time, end_time, rep_type, end_date, rep_opt, room_id, create_by, modified_by, name, type, description, rep_interval, status, ical_uid, ical_sequence, month_absolute, month_relative) VALUES ?';
    const repeatArray = [];
+   let monthAbsolute = null;
+   let monthRelative = null;
+
+   if (params.month_absolute) {
+      monthAbsolute = params.month_absolute;
+   }
+
+   if (params.month_relative_ord && params.month_relative_day) {
+      monthRelative = params.month_relative_ord + params.month_relative_day;
+   }
+
    params.room_id.map((value) => {
       const roomId = value;
       const startTime = Utils.getUnixTime(params.start_time);
@@ -336,10 +351,12 @@ const addEntryRepeatMonth = (params, res, connection) => {
          params.status || 0,
          params.ical_ui || '',
          params.ical_sequence || 0,
-         params.month_absolute || null,
-         params.month_relative || null,
+         monthAbsolute,
+         monthRelative,
       ]);
    });
+   const queryRepeat =
+      'INSERT INTO mrbs_repeat (start_time, end_time, rep_type, end_date, rep_opt, room_id, create_by, modified_by, name, type, description, rep_interval, status, ical_uid, ical_sequence, month_absolute, month_relative) VALUES ?';
    connection.query(queryRepeat, [repeatArray], (error, rows) => {
       connection.release();
       if (!error) {
@@ -349,9 +366,9 @@ const addEntryRepeatMonth = (params, res, connection) => {
          const periodTime =
             Utils.getUnixTime(params.end_time) -
             Utils.getUnixTime(params.start_time);
-         const queryEntry =
-            'INSERT INTO mrbs_entry (start_time, end_time, entry_type, repeat_id, room_id, create_by, modified_by, name, type, description, status) VALUES ?';
          let hasError = false;
+         const startDate = new Date(params.start_time);
+         startDate.setDate(1);
 
          Array(recordAdded)
             .fill()
@@ -360,30 +377,67 @@ const addEntryRepeatMonth = (params, res, connection) => {
                Array(repeatYear)
                   .fill(0)
                   .map((_, index) => {
-                     const startTime =
-                        index === 0
-                           ? Utils.getUnixTime(params.start_time)
-                           : Utils.getUnixTime(
-                                Utils.addDate(
-                                   index,
-                                   params.start_time,
-                                   Constants.AddDateTypes.Month
-                                )
-                             );
-                     paramArray.push([
-                        startTime,
-                        startTime + periodTime,
-                        params.entry_type,
-                        repeatId + index1,
-                        params.room_id[index1],
-                        params.create_by,
-                        params.modified_by || '',
-                        params.name,
-                        params.type,
-                        params.description,
-                        params.status || 0,
-                     ]);
+                     let startTime = '';
+                     // use for monthly date
+                     if (monthAbsolute) {
+                        if (index === 0) {
+                           startTime = Utils.getUnixTime(params.start_time);
+                        } else {
+                           const nextDate = Utils.addDate(
+                              index,
+                              params.start_time,
+                              Constants.AddDateTypes.Month
+                           );
+
+                           if (nextDate.getDate() === monthAbsolute) {
+                              startTime = Utils.getUnixTime(nextDate);
+                           }
+                        }
+                     }
+
+                     // use for monthly day
+                     if (monthRelative) {
+                        let newMonth = startDate;
+                        if (index !== 0) {
+                           newMonth = Utils.addDate(
+                              index,
+                              startDate,
+                              Constants.AddDateTypes.Month
+                           );
+                        }
+                        // all days of month
+                        const allDays = Utils.getAllDayOfWeek(
+                           newMonth,
+                           params.month_relative_day
+                        );
+                        // target date
+                        const targetDate =
+                           allDays[params.month_relative_ord - 1];
+
+                        if (allDays && targetDate) {
+                           startTime = Utils.getUnixTime(targetDate);
+                        }
+                     }
+
+                     if (startTime && startTime !== '') {
+                        paramArray.push([
+                           startTime,
+                           startTime + periodTime,
+                           params.entry_type,
+                           repeatId + index1,
+                           params.room_id[index1],
+                           params.create_by,
+                           params.modified_by || '',
+                           params.name,
+                           params.type,
+                           params.description,
+                           params.status || 0,
+                        ]);
+                     }
                   });
+
+               const queryEntry =
+                  'INSERT INTO mrbs_entry (start_time, end_time, entry_type, repeat_id, room_id, create_by, modified_by, name, type, description, status) VALUES ?';
                connection.query(queryEntry, [paramArray], (err2) => {
                   if (err2) {
                      hasError = true;

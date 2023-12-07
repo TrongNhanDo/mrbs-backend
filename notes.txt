@@ -1,11 +1,11 @@
 {
-   "rep_type": 0,
-   "rep_interval": 0,
+   "start_time": "2024-01-31T12:00:00.000Z",
+   "end_time": "2024-01-31T12:30:00.000Z",
+   "end_date": "2024-02-01T12:00:00.000Z",
+   "rep_opt": "12345",
+   "rep_type": 3,
+   "rep_interval": 1,
    "room_id": [1],
-   "start_time": "2023-12-06T12:00:00.000Z",
-   "end_time": "2023-12-06T12:30:00.000Z",
-   "end_date": "2023-12-07T12:00:00.000Z",
-   "entry_type": 0,
    "create_by": "dtnhan",
    "modified_by": "",
    "name": "dtnhan",
@@ -14,8 +14,12 @@
    "status": 0,
    "ical_uid": "",
    "ical_sequence": "",
-   "month_absolute": "",
+   // "month_absolute": 15,
    "month_relative": "",
-   "rep_opt": "010101",
-   "id": 54
+   "month_relative_ord": 5,
+   "month_relative_day": "SU",
+   "entry_type": 1,
+   "id": 54,
+   // "entry_id": 0,
+   "repeat_id": 72
 }
