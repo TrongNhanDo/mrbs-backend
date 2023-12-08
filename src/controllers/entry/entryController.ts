@@ -818,10 +818,39 @@ const deleteEntry = (req: Request, res: Response) => {
    }
 };
 
+/** Controller uses for delete all entries */
+const deleteAllEntries = (req: Request, res: Response) => {
+   try {
+      dbConnect.getConnection((err, connection) => {
+         if (err) throw err;
+
+         const query = 'DELETE FROM mrbs_entry';
+         connection.query(query, (error) => {
+            if (!err) {
+               connection.release();
+               res.json({
+                  errors: [],
+                  bizResult: Constants.BizResult.Success,
+               });
+            } else {
+               connection.rollback();
+               res.json({
+                  errors: [error],
+                  bizResult: Constants.BizResult.Fail,
+               });
+            }
+         });
+      });
+   } catch (error) {
+      throw error;
+   }
+};
+
 export default {
    getAllEntries,
    getEntryByConditions,
    addEntry,
    updateEntry,
    deleteEntry,
+   deleteAllEntries,
 };
