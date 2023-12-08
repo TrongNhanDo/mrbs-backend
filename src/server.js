@@ -22,16 +22,16 @@ app.get('/', (req, res) => {
 });
 
 // route for user table
-app.use('/api/users/', userRoute);
+app.use('/api/users', userRoute);
 
 // route for room table
-app.use('/api/rooms/', roomRoute);
+app.use('/api/rooms', roomRoute);
 
 // route for participant table
-app.use('/api/participants/', participantRoute);
+app.use('/api/participants', participantRoute);
 
 // route for entry table
-app.use('/api/entries/', entryRoute);
+app.use('/api/entries', entryRoute);
 
 server.listen(port, () => {
    console.log(`Server is running on port ${port}`);

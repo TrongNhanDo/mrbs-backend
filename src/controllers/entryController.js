@@ -1,6 +1,7 @@
 const dbConnect = require('../config/poolConnection');
 const Constants = require('../common/constants');
 const Utils = require('../common/utils');
+const Converter = require('../common/converter');
 
 /** Controller uses for getting all entries registered. */
 const getAllEntries = (req, res) => {
@@ -37,6 +38,36 @@ const getAllEntries = (req, res) => {
                });
             }
          );
+      });
+   } catch (error) {
+      throw error;
+   }
+};
+
+/** Controller uses for get entry by entry_id */
+const getEntryByConditions = (req, res) => {
+   try {
+      dbConnect.getConnection((error, connection) => {
+         if (error) throw error;
+
+         const params = req.body;
+         const queryParams = Converter.convertToQuery(params);
+         const query = 'SELECT * FROM mrbs_entry' + queryParams.searchCondition;
+         connection.query(query, queryParams.values, (err1, rows) => {
+            if (!err1) {
+               connection.release();
+               return res.json({
+                  returnCnt: rows ? rows.length : 0,
+                  entries: rows || [],
+                  bizResult: Constants.BizResult.Success,
+               });
+            }
+
+            return res.json({
+               errors: err1,
+               bizResult: Constants.BizResult.Fail,
+            });
+         });
       });
    } catch (error) {
       throw error;
@@ -759,6 +790,7 @@ const deleteEntry = (req, res) => {
 
 module.exports = {
    getAllEntries,
+   getEntryByConditions,
    addEntry,
    updateEntry,
    deleteEntry,
