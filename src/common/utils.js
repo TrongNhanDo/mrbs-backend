@@ -120,11 +120,11 @@ const isValidDate = (date) => {
    return check;
 };
 
-const getWeekByDate = (date) => {
+const getWeekByDate = (date = new Date(), fromMonday = false) => {
    var week = [];
    const current = date ? new Date(date) : new Date();
    // Starting Sunday (Monday => first + 1)
-   current.setDate(current.getDate() - current.getDay());
+   current.setDate(current.getDate() - current.getDay() + (fromMonday ? 1 : 0));
    for (var i = 0; i < 7; i++) {
       week.push(new Date(current));
       current.setDate(current.getDate() + 1);
