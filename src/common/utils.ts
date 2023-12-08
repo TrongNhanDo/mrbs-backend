@@ -1,7 +1,7 @@
-const DateFns = require('date-fns');
-const Constants = require('./constants');
+import * as DateFns from 'date-fns';
+import * as Constants from '../common/constants';
 
-const checkEmpty = (value) => {
+export const checkEmpty = (value: any) => {
    if (value) {
       return value;
    }
@@ -9,7 +9,7 @@ const checkEmpty = (value) => {
    return '';
 };
 
-const getUnixTime = (date) => {
+export const getUnixTime = (date: string | Date | number) => {
    if (date) {
       return DateFns.getUnixTime(new Date(date));
    }
@@ -17,13 +17,17 @@ const getUnixTime = (date) => {
    return DateFns.getUnixTime(new Date());
 };
 
-const uniTimeToDate = (unixTime) => {
+export const uniTimeToDate = (unixTime: number | string) => {
    return new Date(
-      DateFns.format(new Date(unixTime * 1000), 'yyyy-MM-dd HH:mm:ss')
+      DateFns.format(new Date(Number(unixTime) * 1000), 'yyyy-MM-dd HH:mm:ss')
    );
 };
 
-const addDate = (number, date, type) => {
+export const addDate = (
+   number: number,
+   date: string | Date | number,
+   type: Constants.AddDateTypes
+) => {
    if (!isValidDate(date)) {
       return new Date();
    }
@@ -54,7 +58,7 @@ const addDate = (number, date, type) => {
    }
 };
 
-const getAllDayOfWeek = (date, day) => {
+export const getAllDayOfWeek = (date: string | Date | number, day: string) => {
    let d = new Date(date);
    let month = d.getMonth();
    let dayArray = [];
@@ -64,25 +68,25 @@ const getAllDayOfWeek = (date, day) => {
    let dayOfWeek = '';
    switch (day) {
       case Constants.DayOfWeekTypes.Monday:
-         dayOfWeek = 1;
+         dayOfWeek = '1';
          break;
       case Constants.DayOfWeekTypes.Tuesday:
-         dayOfWeek = 2;
+         dayOfWeek = '2';
          break;
       case Constants.DayOfWeekTypes.Wednesday:
-         dayOfWeek = 3;
+         dayOfWeek = '3';
          break;
       case Constants.DayOfWeekTypes.Thursday:
-         dayOfWeek = 4;
+         dayOfWeek = '4';
          break;
       case Constants.DayOfWeekTypes.Friday:
-         dayOfWeek = 5;
+         dayOfWeek = '5';
          break;
       case Constants.DayOfWeekTypes.Saturday:
-         dayOfWeek = 6;
+         dayOfWeek = '6';
          break;
       case Constants.DayOfWeekTypes.Sunday:
-         dayOfWeek = 0;
+         dayOfWeek = '0';
          break;
       default:
          dayOfWeek = '';
@@ -90,7 +94,7 @@ const getAllDayOfWeek = (date, day) => {
 
    if (dayOfWeek !== '') {
       // Get the first day in the month
-      while (d.getDay() !== dayOfWeek) {
+      while (d.getDay().toString() !== dayOfWeek) {
          d.setDate(d.getDate() + 1);
       }
 
@@ -106,12 +110,12 @@ const getAllDayOfWeek = (date, day) => {
    return [];
 };
 
-const isValidDate = (date) => {
+export const isValidDate = (date: string | Date | number) => {
    let check = false;
 
    const newDate = new Date(date);
 
-   if (isNaN(newDate)) {
+   if (isNaN(newDate.getTime())) {
       check = false;
    } else {
       check = true;
@@ -120,7 +124,10 @@ const isValidDate = (date) => {
    return check;
 };
 
-const getWeekByDate = (date = new Date(), fromMonday = false) => {
+export const getWeekByDate = (
+   date: string | Date | number,
+   fromMonday?: boolean
+) => {
    var week = [];
    const current = date ? new Date(date) : new Date();
    // Starting Sunday (Monday => first + 1)
@@ -132,27 +139,23 @@ const getWeekByDate = (date = new Date(), fromMonday = false) => {
    return week;
 };
 
-const isBeforeDate = (date, dateCompare) => {
+export const isBeforeDate = (
+   date: string | Date | number,
+   dateCompare: string | Date | number
+) => {
    return DateFns.isBefore(new Date(date), new Date(dateCompare));
 };
 
-const isAfterDate = (date, dateCompare) => {
+export const isAfterDate = (
+   date: string | Date | number,
+   dateCompare: string | Date | number
+) => {
    return DateFns.isAfter(new Date(date), new Date(dateCompare));
 };
 
-const isEqualDate = (date, dateCompare) => {
+export const isEqualDate = (
+   date: string | Date | number,
+   dateCompare: string | Date | number
+) => {
    return new Date(date) === new Date(dateCompare);
-};
-
-module.exports = {
-   checkEmpty,
-   getUnixTime,
-   uniTimeToDate,
-   addDate,
-   getAllDayOfWeek,
-   isValidDate,
-   getWeekByDate,
-   isBeforeDate,
-   isAfterDate,
-   isEqualDate,
 };

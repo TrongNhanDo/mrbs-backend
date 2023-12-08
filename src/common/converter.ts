@@ -1,11 +1,12 @@
-const convertToQuery = (params) => {
+export const convertToQuery = (params: object) => {
    const keyInputArr = Object.keys(params);
-   const keyOutputArr = [];
-   const valArr = [];
+   const valInputArr = Object.values(params);
+   const keyOutputArr: string[] = [];
+   const valArr: any[] = [];
 
    if (keyInputArr && keyInputArr.length) {
-      keyInputArr.map((key) => {
-         valArr.push(params[key]);
+      keyInputArr.map((key: string, index: number) => {
+         valArr.push(valInputArr[index]);
          keyOutputArr.push(`${key} = ?`);
       });
 
@@ -21,8 +22,4 @@ const convertToQuery = (params) => {
          values: [],
       };
    }
-};
-
-module.exports = {
-   convertToQuery,
 };

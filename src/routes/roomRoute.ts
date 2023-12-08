@@ -1,5 +1,5 @@
-const express = require('express');
-const roomController = require('../controllers/roomController');
+import express from 'express';
+import roomController from '../controllers/room/roomController';
 
 const roomRoute = express.Router();
 
@@ -10,4 +10,4 @@ roomRoute
    .patch(roomController.updateRoom)
    .delete(roomController.deleteRoom);
 
-module.exports = roomRoute;
+export default roomRoute;

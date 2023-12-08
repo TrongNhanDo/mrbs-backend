@@ -1,4 +1,4 @@
-const mysql = require('mysql');
+import mysql from 'mysql';
 
 const dbConnect = mysql.createPool({
    connectionLimit: 100,
@@ -8,4 +8,4 @@ const dbConnect = mysql.createPool({
    database: 'mrbs',
 });
 
-module.exports = dbConnect;
+export default dbConnect;

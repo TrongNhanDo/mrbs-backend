@@ -1,5 +1,5 @@
-const express = require('express');
-const participantController = require('../controllers/participantController');
+import express from 'express';
+import participantController from '../controllers/participant/participantController';
 
 const participantRoute = express.Router();
 
@@ -10,4 +10,4 @@ participantRoute
    .patch(participantController.updateParticipant)
    .delete(participantController.deleteParticipant);
 
-module.exports = participantRoute;
+export default participantRoute;

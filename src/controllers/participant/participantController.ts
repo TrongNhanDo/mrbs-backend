@@ -1,6 +1,7 @@
-const dbConnect = require('../config/poolConnection');
+import { Request, Response } from 'express';
+import dbConnect from '../../config/poolConnection';
 
-const getAllParticipants = (req, res) => {
+export const getAllParticipants = (req: Request, res: Response) => {
    try {
       dbConnect.getConnection((err, connection) => {
          if (err) throw err;
@@ -25,7 +26,7 @@ const getAllParticipants = (req, res) => {
    }
 };
 
-const addParticipant = (req, res) => {
+export const addParticipant = (req: Request, res: Response) => {
    try {
       dbConnect.getConnection((err, connection) => {
          if (err) throw err;
@@ -58,7 +59,7 @@ const addParticipant = (req, res) => {
    }
 };
 
-const updateParticipant = (req, res) => {
+export const updateParticipant = (req: Request, res: Response) => {
    try {
       dbConnect.getConnection((err, connection) => {
          if (err) throw err;
@@ -87,7 +88,7 @@ const updateParticipant = (req, res) => {
    }
 };
 
-const deleteParticipant = (req, res) => {
+export const deleteParticipant = (req: Request, res: Response) => {
    try {
       const { id } = req.body;
       dbConnect.getConnection((err, connection) => {
@@ -114,7 +115,7 @@ const deleteParticipant = (req, res) => {
    }
 };
 
-module.exports = {
+export default {
    getAllParticipants,
    addParticipant,
    updateParticipant,

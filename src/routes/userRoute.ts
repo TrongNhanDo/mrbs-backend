@@ -1,7 +1,9 @@
-const express = require('express');
-const userController = require('../controllers/userController');
+import express from 'express';
+import userController from '../controllers/user/userController';
 
 const userRoute = express.Router();
+
+userRoute.route('/getUserById/').post(userController.getUserById);
 
 userRoute
    .route('/')
@@ -10,4 +12,4 @@ userRoute
    .patch(userController.updateUser)
    .delete(userController.deleteUser);
 
-module.exports = userRoute;
+export default userRoute;

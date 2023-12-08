@@ -1,22 +1,29 @@
-const dbConnect = require('../config/poolConnection');
-const Constants = require('../common/constants');
-const Utils = require('../common/utils');
-const Converter = require('../common/converter');
+import { Request, Response } from 'express';
+import { MysqlError, Pool, PoolConnection } from 'mysql';
+import dbConnect from '../../config/poolConnection';
+import * as Utils from '../../common/utils';
+import * as Constants from '../../common/constants';
+import * as Converter from '../../common/converter';
 
 /** Controller uses for getting all entries registered. */
-const getAllEntries = (req, res) => {
+const getAllEntries = (req: Request, res: Response) => {
    try {
-      dbConnect.getConnection((err, connection) => {
+      dbConnect.getConnection((err: MysqlError, connection: PoolConnection) => {
          if (err) throw err;
 
-         const { entry_id, username, create_by, registered } = req.body;
+         const params = req.body;
          const query = 'SELECT * FROM mrbs_entry ORDER BY start_time';
          connection.query(
             query,
-            [entry_id, username, create_by, registered],
+            [
+               params.entry_id,
+               params.username,
+               params.create_by,
+               params.registered,
+            ],
             (error, rows) => {
                if (!error) {
-                  rows.map((value) => {
+                  rows.map((value: any) => {
                      console.log({
                         start: Utils.uniTimeToDate(value.start_time),
                         end: Utils.uniTimeToDate(value.end_time),
@@ -45,39 +52,42 @@ const getAllEntries = (req, res) => {
 };
 
 /** Controller uses for get entry by entry_id */
-const getEntryByConditions = (req, res) => {
+const getEntryByConditions = (req: Request, res: Response) => {
    try {
-      dbConnect.getConnection((error, connection) => {
-         if (error) throw error;
+      dbConnect.getConnection(
+         (error: MysqlError, connection: PoolConnection) => {
+            if (error) throw error;
 
-         const params = req.body;
-         const queryParams = Converter.convertToQuery(params);
-         const query = 'SELECT * FROM mrbs_entry' + queryParams.searchCondition;
-         connection.query(query, queryParams.values, (err1, rows) => {
-            if (!err1) {
-               connection.release();
+            const params = req.body;
+            const queryParams = Converter.convertToQuery(params);
+            const query =
+               'SELECT * FROM mrbs_entry' + queryParams.searchCondition;
+            connection.query(query, queryParams.values, (err1, rows) => {
+               if (!err1) {
+                  connection.release();
+                  return res.json({
+                     returnCnt: rows ? rows.length : 0,
+                     entries: rows || [],
+                     bizResult: Constants.BizResult.Success,
+                  });
+               }
+
                return res.json({
-                  returnCnt: rows ? rows.length : 0,
-                  entries: rows || [],
-                  bizResult: Constants.BizResult.Success,
+                  errors: err1,
+                  bizResult: Constants.BizResult.Fail,
                });
-            }
-
-            return res.json({
-               errors: err1,
-               bizResult: Constants.BizResult.Fail,
             });
-         });
-      });
+         }
+      );
    } catch (error) {
       throw error;
    }
 };
 
 /** Controller uses for adding entries depends on the repeat type. */
-const addEntry = (req, res) => {
+const addEntry = (req: Request, res: Response) => {
    try {
-      dbConnect.getConnection((err, connection) => {
+      dbConnect.getConnection((err: MysqlError, connection: PoolConnection) => {
          if (err) throw err;
 
          const params = req.body;
@@ -105,10 +115,14 @@ const addEntry = (req, res) => {
 };
 
 /** Function uses for adding entries when repeat type = 0 (None) */
-const addEntryNoRepeat = (params, res, connection) => {
-   const entryArray = [];
+const addEntryNoRepeat = (
+   params: any,
+   res: Response,
+   connection: PoolConnection
+) => {
+   const entryArray: any[] = [];
 
-   params.room_id.map((value) => {
+   params.room_id.map((value: number) => {
       const roomId = value;
       const startTime = Utils.getUnixTime(params.start_time);
       const endTime = Utils.getUnixTime(params.end_time);
@@ -147,9 +161,13 @@ const addEntryNoRepeat = (params, res, connection) => {
 };
 
 /** Function uses for adding entries when repeat type = 1 (Daily) */
-const addEntryRepeatDaily = (params, res, connection) => {
-   const repeatArray = [];
-   params.room_id.map((value) => {
+const addEntryRepeatDaily = (
+   params: any,
+   res: Response,
+   connection: PoolConnection
+) => {
+   const repeatArray: any[] = [];
+   params.room_id.map((value: number) => {
       const roomId = value;
       const startTime = Utils.getUnixTime(params.start_time);
       const endTime = Utils.getUnixTime(params.end_time);
@@ -187,12 +205,12 @@ const addEntryRepeatDaily = (params, res, connection) => {
             Utils.getUnixTime(params.end_time) -
             Utils.getUnixTime(params.start_time);
          let hasError = false;
-         const errorArray = [];
+         const errorArray: MysqlError[] = [];
 
          Array(recordAdded)
-            .fill()
+            .fill(0)
             .map((_, index1) => {
-               const paramArray = [];
+               const paramArray: any[] = [];
                Array(repeatDay)
                   .fill(0)
                   .map((_, index) => {
@@ -261,9 +279,13 @@ const addEntryRepeatDaily = (params, res, connection) => {
 };
 
 /** Function uses for adding entries when repeat type = 2 (Weekly) */
-const addEntryRepeatWeek = (params, res, connection) => {
-   const repeatArray = [];
-   params.room_id.map((value) => {
+const addEntryRepeatWeek = (
+   params: any,
+   res: Response,
+   connection: PoolConnection
+) => {
+   const repeatArray: any[] = [];
+   params.room_id.map((value: number) => {
       const roomId = value;
       const startTime = Utils.getUnixTime(params.start_time);
       const endTime = Utils.getUnixTime(params.end_time);
@@ -302,12 +324,12 @@ const addEntryRepeatWeek = (params, res, connection) => {
             Utils.getUnixTime(params.end_time) -
             Utils.getUnixTime(params.start_time);
          let hasError = false;
-         const errorArray = [];
+         const errorArray: MysqlError[] = [];
 
          Array(recordAdded)
-            .fill()
+            .fill(0)
             .map((_, index1) => {
-               const paramArray = [];
+               const paramArray: any[] = [];
                Array(repeatWeek)
                   .fill(0)
                   .map((_, index) => {
@@ -392,10 +414,14 @@ const addEntryRepeatWeek = (params, res, connection) => {
 };
 
 /** Function uses for adding entries when repeat type = 3 (Monthly) */
-const addEntryRepeatMonth = (params, res, connection) => {
-   const repeatArray = [];
-   let monthAbsolute = null;
-   let monthRelative = null;
+const addEntryRepeatMonth = (
+   params: any,
+   res: Response,
+   connection: PoolConnection
+) => {
+   const repeatArray: any[] = [];
+   let monthAbsolute: number = null;
+   let monthRelative: string = null;
 
    if (params.month_absolute) {
       monthAbsolute = params.month_absolute;
@@ -405,7 +431,7 @@ const addEntryRepeatMonth = (params, res, connection) => {
       monthRelative = params.month_relative_ord + params.month_relative_day;
    }
 
-   params.room_id.map((value) => {
+   params.room_id.map((value: number) => {
       const roomId = value;
       const startTime = Utils.getUnixTime(params.start_time);
       const endTime = Utils.getUnixTime(params.end_time);
@@ -442,18 +468,18 @@ const addEntryRepeatMonth = (params, res, connection) => {
             Utils.getUnixTime(params.end_time) -
             Utils.getUnixTime(params.start_time);
          let hasError = false;
-         const errorArray = [];
+         const errorArray: MysqlError[] = [];
          const startDate = new Date(params.start_time);
          startDate.setDate(1);
 
          Array(recordAdded)
-            .fill()
+            .fill(0)
             .map((_, index1) => {
-               const paramArray = [];
+               const paramArray: any[] = [];
                Array(repeatMonth)
                   .fill(0)
                   .map((_, index) => {
-                     let startTime = '';
+                     let startTime: number = 0;
                      // use for monthly date
                      if (monthAbsolute) {
                         if (index === 0) {
@@ -495,7 +521,7 @@ const addEntryRepeatMonth = (params, res, connection) => {
                         }
                      }
 
-                     if (startTime && startTime !== '') {
+                     if (startTime && startTime !== 0) {
                         paramArray.push([
                            startTime,
                            startTime + periodTime,
@@ -552,9 +578,13 @@ const addEntryRepeatMonth = (params, res, connection) => {
 };
 
 /** Function uses for adding entries when repeat type = 4 (Yearly) */
-const addEntryRepeatYear = (params, res, connection) => {
-   const repeatArray = [];
-   params.room_id.map((value) => {
+const addEntryRepeatYear = (
+   params: any,
+   res: Response,
+   connection: PoolConnection
+) => {
+   const repeatArray: any[] = [];
+   params.room_id.map((value: number) => {
       const roomId = value;
       const startTime = Utils.getUnixTime(params.start_time);
       const endTime = Utils.getUnixTime(params.end_time);
@@ -593,16 +623,16 @@ const addEntryRepeatYear = (params, res, connection) => {
             Utils.getUnixTime(params.start_time);
          const startDateInput = new Date(params.start_time).getDate();
          let hasError = false;
-         const errorArray = [];
+         const errorArray: MysqlError[] = [];
 
          Array(recordAdded)
-            .fill()
+            .fill(0)
             .map((_, index1) => {
-               const paramArray = [];
+               const paramArray: any[] = [];
                Array(repeatYear)
                   .fill(0)
                   .map((_, index) => {
-                     let startTime = '';
+                     let startTime: number = 0;
                      if (index === 0) {
                         startTime = Utils.getUnixTime(params.start_time);
                      } else {
@@ -617,7 +647,7 @@ const addEntryRepeatYear = (params, res, connection) => {
                         }
                      }
 
-                     if (startTime && startTime !== '') {
+                     if (startTime && startTime !== 0) {
                         paramArray.push([
                            startTime,
                            startTime + periodTime,
@@ -674,15 +704,15 @@ const addEntryRepeatYear = (params, res, connection) => {
 };
 
 /** Controller uses for update entry */
-const updateEntry = (req, res) => {
+const updateEntry = (req: Request, res: Response) => {
    try {
       dbConnect.getConnection((error, connection) => {
          if (error) throw error;
 
          const params = req.body;
          let hasError = false;
-         let errorArray = [];
-         params.room_id.map((value) => {
+         let errorArray: MysqlError[] = [];
+         params.room_id.map((value: number) => {
             const queryUpdate =
                'UPDATE mrbs_entry SET name = ?, description = ?, start_time = ?, end_time = ?, room_id = ?, type = ?, status = ? WHERE id = ?';
             connection.query(
@@ -735,7 +765,7 @@ const updateEntry = (req, res) => {
 };
 
 /** Controller uses for delete entry */
-const deleteEntry = (req, res) => {
+const deleteEntry = (req: Request, res: Response) => {
    try {
       const params = req.body;
       dbConnect.getConnection((err, connection) => {
@@ -788,7 +818,7 @@ const deleteEntry = (req, res) => {
    }
 };
 
-module.exports = {
+export default {
    getAllEntries,
    getEntryByConditions,
    addEntry,

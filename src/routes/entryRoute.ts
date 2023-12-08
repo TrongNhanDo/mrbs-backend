@@ -1,5 +1,5 @@
-const express = require('express');
-const entryController = require('../controllers/entryController');
+import express from 'express';
+import entryController from '../controllers/entry/entryController';
 
 const entryRoute = express.Router();
 
@@ -12,4 +12,4 @@ entryRoute
 
 entryRoute.route('/getByConditions').post(entryController.getEntryByConditions);
 
-module.exports = entryRoute;
+export default entryRoute;

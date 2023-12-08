@@ -1,24 +1,29 @@
-const dbConnect = require('../config/poolConnection');
+import { Request, Response } from 'express';
+import { MysqlError, PoolConnection } from 'mysql';
+import dbConnect from '../../config/poolConnection';
 
-const getAllRooms = (req, res) => {
+const getAllRooms = (req: Request, res: Response) => {
    try {
-      dbConnect.getConnection((err, connection) => {
+      dbConnect.getConnection((err: MysqlError, connection: PoolConnection) => {
          if (err) throw err;
 
-         connection.query('SELECT * from mrbs_room', (err, rows) => {
-            connection.release();
-            if (!err) {
-               return res.json({
-                  data: rows || [],
-                  bizResult: '0',
-               });
-            } else {
-               return res.json({
-                  errors: err,
-                  bizResult: '8',
-               });
+         connection.query(
+            'SELECT * from mrbs_room ORDER BY id',
+            (err: MysqlError, rows) => {
+               if (!err) {
+                  connection.release();
+                  return res.json({
+                     data: rows || [],
+                     bizResult: '0',
+                  });
+               } else {
+                  return res.json({
+                     errors: err,
+                     bizResult: '8',
+                  });
+               }
             }
-         });
+         );
       });
    } catch (error) {
       return res.json({
@@ -27,7 +32,7 @@ const getAllRooms = (req, res) => {
    }
 };
 
-const addRoom = (req, res) => {
+const addRoom = (req: Request, res: Response) => {
    try {
       dbConnect.getConnection((err, connection) => {
          if (err) throw err;
@@ -67,7 +72,7 @@ const addRoom = (req, res) => {
    }
 };
 
-const updateRoom = (req, res) => {
+const updateRoom = (req: Request, res: Response) => {
    try {
       dbConnect.getConnection((err, connection) => {
          if (err) throw err;
@@ -109,7 +114,7 @@ const updateRoom = (req, res) => {
    }
 };
 
-const deleteRoom = (req, res) => {
+const deleteRoom = (req: Request, res: Response) => {
    try {
       const { id } = req.body;
       dbConnect.getConnection((err, connection) => {
@@ -136,7 +141,7 @@ const deleteRoom = (req, res) => {
    }
 };
 
-module.exports = {
+export default {
    getAllRooms,
    addRoom,
    updateRoom,

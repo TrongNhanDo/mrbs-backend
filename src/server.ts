@@ -1,23 +1,27 @@
-const express = require('express');
-const http = require('node:http');
-const path = require('node:path');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-require('dotenv').config();
-const userRoute = require('./routes/userRoute');
-const roomRoute = require('./routes/roomRoute');
-const participantRoute = require('./routes/participantRoute');
-const entryRoute = require('./routes/entryRoute');
+import express from 'express';
+import http from 'http';
+import cors from 'cors';
+import bodyParser from 'body-parser';
+import path from 'path';
+import 'dotenv/config';
+import userRoute from './routes/userRoute';
+import roomRoute from './routes/roomRoute';
+import participantRoute from './routes/participantRoute';
+import entryRoute from './routes/entryRoute';
 
-const app = express(cors);
-
+const app = express();
+app.use(
+   cors({
+      credentials: true,
+   })
+);
 app.use(bodyParser.json());
 
 const server = http.createServer(app);
 
 const port = process.env.PORT;
 
-app.get('/', (req, res) => {
+app.get('/', (req: express.Request, res: express.Response) => {
    res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
