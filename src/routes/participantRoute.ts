@@ -4,10 +4,10 @@ import participantController from '../controllers/participant/participantControl
 const participantRoute = express.Router();
 
 participantRoute
-   .route('')
-   .get(participantController.getAllParticipants)
-   .post(participantController.addParticipant)
-   .patch(participantController.updateParticipant)
-   .delete(participantController.deleteParticipant);
+  .route('')
+  .get(participantController.getAllParticipants)
+  .post(participantController.addParticipant)
+  .patch(participantController.updateParticipant)
+  .delete(participantController.deleteParticipant);
 
 export default participantRoute;
