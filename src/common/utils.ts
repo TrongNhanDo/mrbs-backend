@@ -32,27 +32,18 @@ export const addDate = (
     return new Date();
   }
 
+  const currentDate = new Date(date);
   switch (type) {
     case Constants.AddDateTypes.Year:
-      return new Date(
-        new Date(date).setFullYear(
-          new Date(date).getFullYear() + Number(number)
-        )
-      );
+      return DateFns.addYears(currentDate, number);
     case Constants.AddDateTypes.Month:
-      return new Date(
-        new Date(date).setMonth(new Date(date).getMonth() + Number(number))
-      );
+      return DateFns.addMonths(currentDate, number);
     case Constants.AddDateTypes.Week:
-      return new Date(
-        new Date(date).setDate(new Date(date).getDate() + Number(number * 7))
-      );
+      return DateFns.addWeeks(currentDate, number);
     case Constants.AddDateTypes.Day:
-      return new Date(
-        new Date(date).setDate(new Date(date).getDate() + Number(number))
-      );
+      return DateFns.addDays(currentDate, number);
     default:
-      return new Date(date);
+      return currentDate;
   }
 };
 
