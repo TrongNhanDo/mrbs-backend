@@ -8,10 +8,10 @@ entryRoute.route('/getByConditions').post(entryController.getEntryByConditions);
 entryRoute.route('/deleteAll').delete(entryController.deleteAllEntries);
 
 entryRoute
-   .route('/')
-   .get(entryController.getAllEntries)
-   .post(entryController.addEntry)
-   .patch(entryController.updateEntry)
-   .delete(entryController.deleteEntry);
+  .route('/')
+  .get(entryController.getAllEntries)
+  .post(entryController.addEntry)
+  .patch(entryController.updateEntry)
+  .delete(entryController.deleteEntry);
 
 export default entryRoute;

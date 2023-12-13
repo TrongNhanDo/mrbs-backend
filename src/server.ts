@@ -11,9 +11,9 @@ import entryRoute from './routes/entryRoute';
 
 const app = express();
 app.use(
-   cors({
-      credentials: true,
-   })
+  cors({
+    credentials: true,
+  })
 );
 app.use(bodyParser.json());
 
@@ -22,7 +22,7 @@ const server = http.createServer(app);
 const port = process.env.PORT;
 
 app.get('/', (req: express.Request, res: express.Response) => {
-   res.sendFile(path.join(__dirname, 'views', 'index.html'));
+  res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
 // route for user table
@@ -38,5 +38,5 @@ app.use('/api/participants', participantRoute);
 app.use('/api/entries', entryRoute);
 
 server.listen(port, () => {
-   console.log(`Server is running on port ${port}`);
+  console.log(`Server is running on port ${port}`);
 });
