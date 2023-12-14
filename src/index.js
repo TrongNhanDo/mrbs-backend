@@ -42,7 +42,7 @@ app.get('/', async (req, res) => {
     },
     data: {
       changeType: 'created,updated,deleted',
-      notificationUrl: 'https://dtnhan.cyclic.app/calendar/',
+      notificationUrl: 'https://dtnhan.cyclic.app/api/calendar/',
       resource: '/me/events',
       expirationDateTime: '2023-12-14T03:30:00.000Z',
       clientState: 'secretClientValue',
@@ -50,6 +50,7 @@ app.get('/', async (req, res) => {
     },
   });
   console.log({ subscription });
+
   res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
