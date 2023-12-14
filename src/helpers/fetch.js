@@ -9,6 +9,7 @@ async function callApi(endpoint, accessToken) {
   const options = {
     headers: {
       Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
     },
   };
 

@@ -23,13 +23,16 @@ const tokenRequest = {
 };
 
 const apiConfig = {
-	uri: process.env.GRAPH_ENDPOINT + 'v1.0/users', // e.g. 'https://graph.microsoft.com/v1.0/users'
+  // e.g. 'https://graph.microsoft.com/v1.0/users'
+  // e.g. 'https://graph.microsoft.com/v1.0/me'
+	uri: process.env.GRAPH_ENDPOINT + process.env.ENDPOINT_VALUE
 };
 
 /**
  * Initialize a confidential client application. For more info, visit:
  * https://github.com/AzureAD/microsoft-authentication-library-for-js/blob/dev/lib/msal-node/docs/initialize-confidential-client-application.md
  */
+console.log({msalConfig});
 const cca = new msal.ConfidentialClientApplication(msalConfig);
 
 /**

@@ -1,8 +1,15 @@
 const express = require('express');
 const calendarController = require('../controllers/calendarController');
 
-const userRoute = express.Router();
+const calendarRoute = express.Router();
 
-userRoute.route('/').post(calendarController.listenCalendarEvent);
+calendarRoute
+  .route('/')
+  .get(calendarController.getAllEvents)
+  .post(calendarController.addEvent);
 
-module.exports = userRoute;
+calendarRoute
+  .route('/get-by-conditions')
+  .get(calendarController.getEventByCondition);
+
+module.exports = calendarRoute;
