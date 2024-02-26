@@ -18,7 +18,7 @@ const server = http.createServer(app);
 const port = process.env.PORT;
 
 app.get('/', (req, res) => {
-   res.sendFile(path.join(__dirname, 'views', 'index.html'));
+  res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
 // route for user table
@@ -34,5 +34,5 @@ app.use('/api/participants', participantRoute);
 app.use('/api/entries', entryRoute);
 
 server.listen(port, () => {
-   console.log(`Server is running on port ${port}`);
+  console.log(`Server is running on port ${port}`);
 });
