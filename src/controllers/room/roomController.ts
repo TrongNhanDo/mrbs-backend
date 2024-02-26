@@ -14,12 +14,12 @@ const getAllRooms = (req: Request, res: Response) => {
             connection.release();
             return res.json({
               data: rows || [],
-              bizResult: '0',
+              bizResult: '0'
             });
           } else {
             return res.json({
               errors: err,
-              bizResult: '8',
+              bizResult: '8'
             });
           }
         }
@@ -27,7 +27,7 @@ const getAllRooms = (req: Request, res: Response) => {
     });
   } catch (error) {
     return res.json({
-      errors: error,
+      errors: error
     });
   }
 };
@@ -48,7 +48,7 @@ const addRoom = (req: Request, res: Response) => {
           params.area_id,
           params.description,
           params.capacity,
-          params.room_admin_email,
+          params.room_admin_email
         ],
         (err, rows) => {
           connection.release();
@@ -56,12 +56,12 @@ const addRoom = (req: Request, res: Response) => {
             return res.json({
               message: 'Add successfully!',
               insertId: rows.insertId || undefined,
-              bizResult: '0',
+              bizResult: '0'
             });
           } else {
             return res.json({
               message: err.message || undefined,
-              bizResult: '8',
+              bizResult: '8'
             });
           }
         }
@@ -91,19 +91,19 @@ const updateRoom = (req: Request, res: Response) => {
           params.capacity,
           params.room_admin_email,
           params.invalid_types,
-          params.id,
+          params.id
         ],
         (err) => {
           connection.release();
           if (!err) {
             return res.json({
               message: `Update successfully!`,
-              bizResult: '0',
+              bizResult: '0'
             });
           } else {
             return res.json({
               bizResult: '8',
-              errors: err,
+              errors: err
             });
           }
         }
@@ -126,12 +126,12 @@ const deleteRoom = (req: Request, res: Response) => {
         if (!err) {
           res.json({
             message: 'Delete successfully!',
-            bizResult: '0',
+            bizResult: '0'
           });
         } else {
           res.json({
             bizResult: '8',
-            errors: err,
+            errors: err
           });
         }
       });
@@ -145,5 +145,5 @@ export default {
   getAllRooms,
   addRoom,
   updateRoom,
-  deleteRoom,
+  deleteRoom
 };

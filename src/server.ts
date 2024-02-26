@@ -10,11 +10,7 @@ import participantRoute from './routes/participantRoute';
 import entryRoute from './routes/entryRoute';
 
 const app = express();
-app.use(
-  cors({
-    credentials: true,
-  })
-);
+app.use(cors({ credentials: true }));
 app.use(bodyParser.json());
 
 const server = http.createServer(app);

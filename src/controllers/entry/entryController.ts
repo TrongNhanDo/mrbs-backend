@@ -21,7 +21,7 @@ const getAllEntries = (req: Request, res: Response) => {
             rows.map((value: any) => {
               console.log({
                 start: Utils.uniTimeToDate(value.start_time),
-                end: Utils.uniTimeToDate(value.end_time),
+                end: Utils.uniTimeToDate(value.end_time)
               });
             });
 
@@ -29,14 +29,14 @@ const getAllEntries = (req: Request, res: Response) => {
             return res.json({
               returnCnt: rows ? rows.length : 0,
               entries: rows || [],
-              bizResult: Constants.BizResult.Success,
+              bizResult: Constants.BizResult.Success
             });
           }
 
           connection.rollback();
           return res.json({
             errors: error,
-            bizResult: Constants.BizResult.Fail,
+            bizResult: Constants.BizResult.Fail
           });
         }
       );
@@ -61,13 +61,13 @@ const getEntryByConditions = (req: Request, res: Response) => {
           return res.json({
             returnCnt: rows ? rows.length : 0,
             entries: rows || [],
-            bizResult: Constants.BizResult.Success,
+            bizResult: Constants.BizResult.Success
           });
         }
 
         return res.json({
           errors: err1,
-          bizResult: Constants.BizResult.Fail,
+          bizResult: Constants.BizResult.Fail
         });
       });
     });
@@ -97,7 +97,7 @@ const addEntry = (req: Request, res: Response) => {
         default:
           return res.json({
             message: 'rep_type is undefined.',
-            bizResult: Constants.BizResult.Fail,
+            bizResult: Constants.BizResult.Fail
           });
       }
     });
@@ -129,7 +129,7 @@ const addEntryNoRepeat = (
       params.name,
       params.type,
       params.description || '',
-      params.status || 0,
+      params.status || 0
     ]);
   });
 
@@ -140,14 +140,14 @@ const addEntryNoRepeat = (
       connection.release();
       return res.json({
         message: 'Add entry successfully!',
-        bizResult: Constants.BizResult.Success,
+        bizResult: Constants.BizResult.Success
       });
     }
 
     connection.rollback();
     return res.json({
       errors: error,
-      bizResult: Constants.BizResult.Fail,
+      bizResult: Constants.BizResult.Fail
     });
   });
 };
@@ -182,7 +182,7 @@ const addEntryRepeatDaily = (
       params.ical_ui || '',
       params.ical_sequence || 0,
       params.month_absolute || null,
-      params.month_relative || null,
+      params.month_relative || null
     ]);
   });
 
@@ -227,7 +227,7 @@ const addEntryRepeatDaily = (
                 params.name,
                 params.type,
                 params.description,
-                params.status || 0,
+                params.status || 0
               ]);
             });
 
@@ -241,7 +241,7 @@ const addEntryRepeatDaily = (
               connection.rollback();
               return res.json({
                 errors: errorArray,
-                bizResult: Constants.BizResult.Fail,
+                bizResult: Constants.BizResult.Fail
               });
             }
           });
@@ -251,20 +251,20 @@ const addEntryRepeatDaily = (
         connection.release();
         return res.json({
           message: 'Add entry successfully!',
-          bizResult: Constants.BizResult.Success,
+          bizResult: Constants.BizResult.Success
         });
       }
 
       connection.rollback();
       return res.json({
         errors: error,
-        bizResult: Constants.BizResult.Fail,
+        bizResult: Constants.BizResult.Fail
       });
     } else {
       connection.rollback();
       return res.json({
         errors: error,
-        bizResult: Constants.BizResult.Fail,
+        bizResult: Constants.BizResult.Fail
       });
     }
   });
@@ -300,7 +300,7 @@ const addEntryRepeatWeek = (
       params.ical_ui || '',
       params.ical_sequence || 0,
       params.month_absolute || null,
-      params.month_relative || null,
+      params.month_relative || null
     ]);
   });
 
@@ -360,7 +360,7 @@ const addEntryRepeatWeek = (
                     params.name,
                     params.type,
                     params.description,
-                    params.status || 0,
+                    params.status || 0
                   ]);
                 });
               }
@@ -376,7 +376,7 @@ const addEntryRepeatWeek = (
               connection.rollback();
               return res.json({
                 errors: errorArray,
-                bizResult: Constants.BizResult.Fail,
+                bizResult: Constants.BizResult.Fail
               });
             }
           });
@@ -386,20 +386,20 @@ const addEntryRepeatWeek = (
         connection.release();
         return res.json({
           message: 'Add entry successfully!',
-          bizResult: Constants.BizResult.Success,
+          bizResult: Constants.BizResult.Success
         });
       }
 
       connection.rollback();
       return res.json({
         errors: error,
-        bizResult: Constants.BizResult.Fail,
+        bizResult: Constants.BizResult.Fail
       });
     } else {
       connection.rollback();
       return res.json({
         errors: error,
-        bizResult: Constants.BizResult.Fail,
+        bizResult: Constants.BizResult.Fail
       });
     }
   });
@@ -446,7 +446,7 @@ const addEntryRepeatMonth = (
       params.ical_ui || '',
       params.ical_sequence || 0,
       monthAbsolute,
-      monthRelative,
+      monthRelative
     ]);
   });
   const queryRepeat =
@@ -524,7 +524,7 @@ const addEntryRepeatMonth = (
                   params.name,
                   params.type,
                   params.description,
-                  params.status || 0,
+                  params.status || 0
                 ]);
               }
             });
@@ -539,7 +539,7 @@ const addEntryRepeatMonth = (
               connection.rollback();
               return res.json({
                 errors: errorArray,
-                bizResult: Constants.BizResult.Fail,
+                bizResult: Constants.BizResult.Fail
               });
             }
           });
@@ -549,20 +549,20 @@ const addEntryRepeatMonth = (
         connection.release();
         return res.json({
           message: 'Add entry successfully!',
-          bizResult: Constants.BizResult.Success,
+          bizResult: Constants.BizResult.Success
         });
       }
 
       connection.rollback();
       return res.json({
         errors: error,
-        bizResult: Constants.BizResult.Fail,
+        bizResult: Constants.BizResult.Fail
       });
     } else {
       connection.rollback();
       return res.json({
         errors: error,
-        bizResult: Constants.BizResult.Fail,
+        bizResult: Constants.BizResult.Fail
       });
     }
   });
@@ -598,7 +598,7 @@ const addEntryRepeatYear = (
       params.ical_ui || '',
       params.ical_sequence || 0,
       params.month_absolute || null,
-      params.month_relative || null,
+      params.month_relative || null
     ]);
   });
 
@@ -650,7 +650,7 @@ const addEntryRepeatYear = (
                   params.name,
                   params.type,
                   params.description,
-                  params.status || 0,
+                  params.status || 0
                 ]);
               }
             });
@@ -665,7 +665,7 @@ const addEntryRepeatYear = (
               connection.rollback();
               return res.json({
                 errors: errorArray,
-                bizResult: Constants.BizResult.Fail,
+                bizResult: Constants.BizResult.Fail
               });
             }
           });
@@ -675,20 +675,20 @@ const addEntryRepeatYear = (
         connection.release();
         return res.json({
           message: 'Add entry successfully!',
-          bizResult: Constants.BizResult.Success,
+          bizResult: Constants.BizResult.Success
         });
       }
 
       connection.rollback();
       return res.json({
         errors: error,
-        bizResult: Constants.BizResult.Fail,
+        bizResult: Constants.BizResult.Fail
       });
     } else {
       connection.rollback();
       return res.json({
         errors: error,
-        bizResult: Constants.BizResult.Fail,
+        bizResult: Constants.BizResult.Fail
       });
     }
   });
@@ -716,7 +716,7 @@ const updateEntry = (req: Request, res: Response) => {
             value,
             params.type,
             params.status,
-            params.id,
+            params.id
           ],
           (err) => {
             if (err) {
@@ -726,7 +726,7 @@ const updateEntry = (req: Request, res: Response) => {
 
               return res.json({
                 errors: err,
-                bizResult: Constants.BizResult.Fail,
+                bizResult: Constants.BizResult.Fail
               });
             }
           }
@@ -737,20 +737,20 @@ const updateEntry = (req: Request, res: Response) => {
         connection.rollback();
         return res.json({
           errors: errorArray,
-          bizResult: Constants.BizResult.Fail,
+          bizResult: Constants.BizResult.Fail
         });
       } else {
         connection.release();
         return res.json({
           message: 'Update entry successfully!',
-          bizResult: Constants.BizResult.Success,
+          bizResult: Constants.BizResult.Success
         });
       }
     });
   } catch (error) {
     return res.json({
       errors: error,
-      bizResult: Constants.BizResult.Fail,
+      bizResult: Constants.BizResult.Fail
     });
   }
 };
@@ -769,13 +769,13 @@ const deleteEntry = (req: Request, res: Response) => {
             connection.release();
             res.json({
               message: 'Delete entry based on entryId successfully!',
-              bizResult: Constants.BizResult.Success,
+              bizResult: Constants.BizResult.Success
             });
           } else {
             connection.rollback();
             res.json({
               errors: error,
-              bizResult: Constants.BizResult.Fail,
+              bizResult: Constants.BizResult.Fail
             });
           }
         });
@@ -787,13 +787,13 @@ const deleteEntry = (req: Request, res: Response) => {
             connection.release();
             res.json({
               message: 'Delete entry based on repeatId successfully!',
-              bizResult: Constants.BizResult.Success,
+              bizResult: Constants.BizResult.Success
             });
           } else {
             connection.rollback();
             res.json({
               errors: error,
-              bizResult: Constants.BizResult.Fail,
+              bizResult: Constants.BizResult.Fail
             });
           }
         });
@@ -801,7 +801,7 @@ const deleteEntry = (req: Request, res: Response) => {
 
       return res.json({
         message: 'EntryId or RepeatId is undefined.',
-        bizResult: Constants.BizResult.Fail,
+        bizResult: Constants.BizResult.Fail
       });
     });
   } catch (error) {
@@ -821,13 +821,13 @@ const deleteAllEntries = (req: Request, res: Response) => {
           connection.release();
           res.json({
             errors: [],
-            bizResult: Constants.BizResult.Success,
+            bizResult: Constants.BizResult.Success
           });
         } else {
           connection.rollback();
           res.json({
             errors: [error],
-            bizResult: Constants.BizResult.Fail,
+            bizResult: Constants.BizResult.Fail
           });
         }
       });
@@ -843,5 +843,5 @@ export default {
   addEntry,
   updateEntry,
   deleteEntry,
-  deleteAllEntries,
+  deleteAllEntries
 };

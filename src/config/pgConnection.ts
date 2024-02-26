@@ -5,7 +5,7 @@ const pgConnection = new Client({
   user: 'postgres',
   port: 5432,
   password: '123123',
-  database: 'mrbs',
+  database: 'mrbs'
 });
 
 export default pgConnection;

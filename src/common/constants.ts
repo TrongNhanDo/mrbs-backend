@@ -1,13 +1,13 @@
 export enum BizResult {
   Success = '0',
-  Fail = '8',
+  Fail = '8'
 }
 
 export enum AddDateTypes {
   Year = 'year',
   Month = 'month',
   Week = 'week',
-  Day = 'day',
+  Day = 'day'
 }
 
 export enum DayOfWeekTypes {
@@ -17,5 +17,5 @@ export enum DayOfWeekTypes {
   Thursday = 'TH',
   Friday = 'FR',
   Saturday = 'SA',
-  Sunday = 'SU',
+  Sunday = 'SU'
 }

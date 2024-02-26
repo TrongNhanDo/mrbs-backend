@@ -11,12 +11,12 @@ export const getAllParticipants = (req: Request, res: Response) => {
         if (!err) {
           return res.json({
             data: rows || [],
-            bizResult: '0',
+            bizResult: '0'
           });
         } else {
           return res.json({
             errors: err,
-            bizResult: '8',
+            bizResult: '8'
           });
         }
       });
@@ -43,12 +43,12 @@ export const addParticipant = (req: Request, res: Response) => {
             return res.json({
               message: 'Add successfully!',
               insertId: rows.insertId || undefined,
-              bizResult: '0',
+              bizResult: '0'
             });
           } else {
             return res.json({
               message: err.message || undefined,
-              bizResult: '8',
+              bizResult: '8'
             });
           }
         }
@@ -73,12 +73,12 @@ export const updateParticipant = (req: Request, res: Response) => {
         if (!err) {
           return res.json({
             message: `Update successfully!`,
-            bizResult: '0',
+            bizResult: '0'
           });
         } else {
           return res.json({
             bizResult: '8',
-            errors: err,
+            errors: err
           });
         }
       });
@@ -100,12 +100,12 @@ export const deleteParticipant = (req: Request, res: Response) => {
         if (!err) {
           res.json({
             message: 'Delete successfully!',
-            bizResult: '0',
+            bizResult: '0'
           });
         } else {
           res.json({
             bizResult: '8',
-            errors: err,
+            errors: err
           });
         }
       });
@@ -119,5 +119,5 @@ export default {
   getAllParticipants,
   addParticipant,
   updateParticipant,
-  deleteParticipant,
+  deleteParticipant
 };

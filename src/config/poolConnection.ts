@@ -5,7 +5,7 @@ const dbConnect = mysql.createPool({
   host: 'localhost',
   user: 'root',
   password: '',
-  database: 'mrbs',
+  database: 'mrbs'
 });
 
 export default dbConnect;

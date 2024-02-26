@@ -4,7 +4,7 @@ import userController from '../controllers/user/userController';
 const userRoute = express.Router();
 
 userRoute.route('/getUserById/').post(userController.getUserById);
-
+userRoute.route('/:userId').get(userController.getAllUsers);
 userRoute
   .route('/')
   .get(userController.getAllUsers)

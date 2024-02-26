@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response, query } from 'express';
 import { MysqlError, PoolConnection } from 'mysql';
 import dbConnect from '../../config/poolConnection';
 import * as CommonTypes from '../../common/types';
@@ -10,8 +10,22 @@ const getAllUsers = (req: Request, res: Response) => {
     dbConnect.getConnection((err: MysqlError, connection: PoolConnection) => {
       if (err) throw err;
 
+      let queryString = '';
+      const queryParams: any[] = [];
+
+      const params = req.params;
+      if (params && params.userId) {
+        queryString =
+          'SELECT * from mrbs_users WHERE id = ? GROUP BY level, name ORDER BY level, name';
+        queryParams.push(params.userId);
+      } else {
+        queryString =
+          'SELECT * from mrbs_users GROUP BY level, name ORDER BY level, name';
+      }
+
       connection.query(
-        'SELECT * from mrbs_users GROUP BY level, name ORDER BY level, name',
+        queryString,
+        queryParams,
         (err: MysqlError, rows: Types.UserProps[]) => {
           if (!err) {
             connection.release();
@@ -19,13 +33,13 @@ const getAllUsers = (req: Request, res: Response) => {
               returnCnt: rows.length || 0,
               userList: rows || [],
               errors: [],
-              bizResult: Constants.BizResult.Success,
+              bizResult: Constants.BizResult.Success
             };
             return res.json(response);
           } else {
             const response: CommonTypes.ResponseProps = {
               errors: [err],
-              bizResult: Constants.BizResult.Fail,
+              bizResult: Constants.BizResult.Fail
             };
             return res.json(response);
           }
@@ -54,13 +68,13 @@ const getUserById = (req: Request, res: Response) => {
               returnCnt: rows.length || 0,
               userList: rows || [],
               errors: [],
-              bizResult: Constants.BizResult.Success,
+              bizResult: Constants.BizResult.Success
             };
             return res.json(response);
           } else {
             const response: CommonTypes.ResponseProps = {
               errors: [err],
-              bizResult: Constants.BizResult.Fail,
+              bizResult: Constants.BizResult.Fail
             };
             return res.json(response);
           }
@@ -89,21 +103,21 @@ const addUser = (req: Request, res: Response) => {
           params.display_name,
           params.password_hash,
           params.email,
-          params.last_login,
+          params.last_login
         ],
         (err) => {
           if (!err) {
             connection.release();
             const response: CommonTypes.ResponseProps = {
               errors: [],
-              bizResult: Constants.BizResult.Success,
+              bizResult: Constants.BizResult.Success
             };
             return res.json(response);
           } else {
             connection.rollback();
             const response: CommonTypes.ResponseProps = {
               errors: [err],
-              bizResult: Constants.BizResult.Fail,
+              bizResult: Constants.BizResult.Fail
             };
             return res.json(response);
           }
@@ -130,21 +144,21 @@ const updateUser = (req: Request, res: Response) => {
           params.display_name,
           params.password_hash,
           params.email,
-          params.id,
+          params.id
         ],
         (err) => {
           if (!err) {
             connection.release();
             const response: CommonTypes.ResponseProps = {
               errors: [],
-              bizResult: Constants.BizResult.Success,
+              bizResult: Constants.BizResult.Success
             };
             return res.json(response);
           } else {
             connection.rollback();
             const response: CommonTypes.ResponseProps = {
               errors: [err],
-              bizResult: Constants.BizResult.Fail,
+              bizResult: Constants.BizResult.Fail
             };
             return res.json(response);
           }
@@ -168,14 +182,14 @@ const deleteUser = (req: Request, res: Response) => {
           connection.release();
           const response: CommonTypes.ResponseProps = {
             errors: [],
-            bizResult: Constants.BizResult.Success,
+            bizResult: Constants.BizResult.Success
           };
           return res.json(response);
         } else {
           connection.rollback();
           const response: CommonTypes.ResponseProps = {
             errors: [err],
-            bizResult: Constants.BizResult.Fail,
+            bizResult: Constants.BizResult.Fail
           };
           return res.json(response);
         }
@@ -191,5 +205,5 @@ export default {
   addUser,
   updateUser,
   deleteUser,
-  getUserById,
+  getUserById
 };

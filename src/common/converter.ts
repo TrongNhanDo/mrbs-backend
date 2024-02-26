@@ -13,13 +13,13 @@ export const convertToQuery = (params: object) => {
     return {
       searchCondition: ' WHERE ' + keyOutputArr.join(' AND '),
       keys: keyInputArr,
-      values: valArr,
+      values: valArr
     };
   } else {
     return {
       searchCondition: '',
       keys: [],
-      values: [],
+      values: []
     };
   }
 };
