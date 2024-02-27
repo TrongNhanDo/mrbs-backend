@@ -12,13 +12,13 @@ const getUsers = (req: Request, res: Response) => {
       if (err) throw err;
 
       let queryString = '';
-      const queryParams: any[] = [];
+      const queryParams: number[] = [];
 
       const params = req.params;
       if (params && params.userId) {
         queryString =
           'SELECT * from mrbs_users WHERE id = ? GROUP BY level, name ORDER BY level, name';
-        queryParams.push(params.userId);
+        queryParams.push(Number(params.userId));
       } else {
         queryString =
           'SELECT * from mrbs_users GROUP BY level, name ORDER BY level, name';
@@ -61,7 +61,7 @@ const addUser = (req: Request, res: Response) => {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.json({
-          bizResult: '8',
+          bizResult: Constants.BizResult.Fail,
           errors: errors.array()
         });
       }

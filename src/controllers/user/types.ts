@@ -38,3 +38,7 @@ export type ResponseGetAllUsersProps = {
   userList: UserProps[];
   returnCnt: number;
 } & CommonTypes.ResponseProps;
+
+export type GetUserByIdProps = {
+  userId: number;
+};
