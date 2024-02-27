@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { MysqlError, PoolConnection } from 'mysql';
 import dbConnect from '../../config/poolConnection';
-import { validationAddRoom } from './validations';
 
 const getAllRooms = (req: Request, res: Response) => {
   try {
@@ -39,15 +38,6 @@ const addRoom = (req: Request, res: Response) => {
       if (err) throw err;
 
       const params = req.body;
-      const validation = validationAddRoom(params);
-      if (validation.fails()) {
-        const errors = validation.errors.all();
-        return res.json({
-          errors,
-          bizResult: '8'
-        });
-      }
-
       const query =
         'INSERT INTO mrbs_room (room_name, sort_key, area_id, description, capacity, room_admin_email) VALUES (?,?,?,?,?,?)';
       connection.query(
