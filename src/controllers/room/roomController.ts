@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { MysqlError, PoolConnection } from 'mysql';
 import dbConnect from '../../config/poolConnection';
+import { validationAddRoom } from './validations';
 
 const getAllRooms = (req: Request, res: Response) => {
   try {
@@ -38,6 +39,15 @@ const addRoom = (req: Request, res: Response) => {
       if (err) throw err;
 
       const params = req.body;
+      const validation = validationAddRoom(params);
+      if (validation.fails()) {
+        const errors = validation.errors.all();
+        return res.json({
+          errors,
+          bizResult: '8'
+        });
+      }
+
       const query =
         'INSERT INTO mrbs_room (room_name, sort_key, area_id, description, capacity, room_admin_email) VALUES (?,?,?,?,?,?)';
       connection.query(
@@ -53,17 +63,17 @@ const addRoom = (req: Request, res: Response) => {
         (err, rows) => {
           connection.release();
           if (!err) {
+            console.log({ added: rows });
             return res.json({
-              message: 'Add successfully!',
-              insertId: rows.insertId || undefined,
-              bizResult: '0'
-            });
-          } else {
-            return res.json({
-              message: err.message || undefined,
-              bizResult: '8'
+              bizResult: '0',
+              errors: []
             });
           }
+
+          return res.json({
+            bizResult: '8',
+            errors: []
+          });
         }
       );
     });
