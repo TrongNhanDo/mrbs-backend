@@ -18,12 +18,8 @@ app.use(bodyParser.json());
 
 const server = http.createServer(app);
 
-const isMongodb = process.env.DB_MODE === CommonConstants.DbTypes.MongoDB;
-
-if (isMongodb) {
-  /** connect to MongoDB database */
-  mongodbConnection();
-}
+/** connect to MongoDB database */
+mongodbConnection();
 
 const port = process.env.PORT;
 
@@ -43,19 +39,13 @@ app.use('/api/participants', participantRoute);
 // route for entry table
 app.use('/api/entries', entryRoute);
 
-if (isMongodb) {
-  mongoose.connection.once('open', () => {
-    console.log('Connected to MongoDB Database');
-    server.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
-    });
-  });
-
-  mongoose.connection.on('error', (err) => {
-    console.log({ errorConnectMongoDB: err });
-  });
-} else {
+mongoose.connection.once('open', () => {
+  console.log('Connected to MongoDB Database');
   server.listen(port, () => {
     console.log(`Server is running on port ${port}`);
   });
-}
+});
+
+mongoose.connection.on('error', (err) => {
+  console.log({ errorConnectMongoDB: err });
+});

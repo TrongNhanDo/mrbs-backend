@@ -10,7 +10,7 @@ import {
 const userRoute = express.Router();
 
 /** get user by id */
-userRoute.route('/:userId').get(userController.getUsers);
+userRoute.route('/:userId').get(userController.getUserById);
 
 /** get all users */
 userRoute.route('/').get(userController.getUsers);

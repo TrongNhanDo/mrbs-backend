@@ -48,6 +48,12 @@ export const validationUpdateUser = [
     .if((value) => value !== undefined)
     .isInt()
     .withMessage('The level field must be number.'),
+  body('name')
+    .notEmpty()
+    .withMessage('The name field is a required field.')
+    .if((value) => value !== undefined)
+    .isString()
+    .withMessage('The name field must be number.'),
   body('display_name')
     .notEmpty()
     .withMessage('The display_name field is a required field.')
