@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
+import { validationResult } from 'express-validator';
 import { MysqlError, PoolConnection } from 'mysql';
 import dbConnect from '../../config/poolConnection';
 import * as CommonConstants from '../../common/constants';
 import * as types from './types';
-import { validationResult } from 'express-validator';
 
 const getAllRooms = (req: Request, res: Response) => {
   try {

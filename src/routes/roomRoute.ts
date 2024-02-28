@@ -4,7 +4,7 @@ import {
   validationAddRoom,
   validationDeleteRoom,
   validationUpdateRoom
-} from 'controllers/room/validations';
+} from '../controllers/room/validations';
 
 const roomRoute = express.Router();
 
