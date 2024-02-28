@@ -1,6 +1,9 @@
 import { Request, Response } from 'express';
 import { MysqlError, PoolConnection } from 'mysql';
 import dbConnect from '../../config/poolConnection';
+import * as CommonConstants from '../../common/constants';
+import * as types from './types';
+import { validationResult } from 'express-validator';
 
 const getAllRooms = (req: Request, res: Response) => {
   try {
@@ -14,12 +17,12 @@ const getAllRooms = (req: Request, res: Response) => {
             connection.release();
             return res.json({
               data: rows || [],
-              bizResult: '0'
+              bizResult: CommonConstants.BizResult.Success
             });
           } else {
             return res.json({
               errors: err,
-              bizResult: '8'
+              bizResult: CommonConstants.BizResult.Fail
             });
           }
         }
@@ -37,31 +40,39 @@ const addRoom = (req: Request, res: Response) => {
     dbConnect.getConnection((err, connection) => {
       if (err) throw err;
 
-      const params = req.body;
+      const params: types.AddRoomProps = req.body;
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.json({
+          bizResult: CommonConstants.BizResult.Fail,
+          errors: errors.array()
+        });
+      }
+
       const query =
-        'INSERT INTO mrbs_room (room_name, sort_key, area_id, description, capacity, room_admin_email) VALUES (?,?,?,?,?,?)';
+        'INSERT INTO mrbs_room (room_name, sort_key, description, capacity, room_admin_email, disabled) VALUES (?,?,?,?,?,?)';
       connection.query(
         query,
         [
           params.room_name,
           params.sort_key,
-          params.area_id,
           params.description,
           params.capacity,
-          params.room_admin_email
+          params.room_admin_email,
+          params.disabled || 0
         ],
         (err, rows) => {
           connection.release();
           if (!err) {
             console.log({ added: rows });
             return res.json({
-              bizResult: '0',
+              bizResult: CommonConstants.BizResult.Success,
               errors: []
             });
           }
 
           return res.json({
-            bizResult: '8',
+            bizResult: CommonConstants.BizResult.Fail,
             errors: []
           });
         }
@@ -77,32 +88,38 @@ const updateRoom = (req: Request, res: Response) => {
     dbConnect.getConnection((err, connection) => {
       if (err) throw err;
 
-      const params = req.body;
+      const params: types.UpdateRoomProps = req.body;
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.json({
+          bizResult: CommonConstants.BizResult.Fail,
+          errors: errors.array()
+        });
+      }
+
       const query =
-        'UPDATE mrbs_room SET disabled = ?, area_id = ?, room_name = ?, sort_key = ?, description = ?, capacity = ?, room_admin_email = ?, invalid_types = ? WHERE id = ?';
+        'UPDATE mrbs_room SET disabled = ?, room_name = ?, sort_key = ?, description = ?, capacity = ?, room_admin_email = ? WHERE id = ?';
       connection.query(
         query,
         [
           params.disabled,
-          params.area_id,
           params.room_name,
           params.sort_key,
           params.description,
           params.capacity,
           params.room_admin_email,
-          params.invalid_types,
           params.id
         ],
         (err) => {
           connection.release();
           if (!err) {
             return res.json({
-              message: `Update successfully!`,
-              bizResult: '0'
+              errors: [],
+              bizResult: CommonConstants.BizResult.Success
             });
           } else {
             return res.json({
-              bizResult: '8',
+              bizResult: CommonConstants.BizResult.Fail,
               errors: err
             });
           }
@@ -116,21 +133,29 @@ const updateRoom = (req: Request, res: Response) => {
 
 const deleteRoom = (req: Request, res: Response) => {
   try {
-    const { id } = req.body;
     dbConnect.getConnection((err, connection) => {
       if (err) throw err;
 
+      const params: types.DeleteRoomProps = req.body;
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.json({
+          bizResult: CommonConstants.BizResult.Fail,
+          errors: errors.array()
+        });
+      }
+
       const query = 'DELETE FROM mrbs_room WHERE id = ?';
-      connection.query(query, [id], (err) => {
+      connection.query(query, [params.id], (err) => {
         connection.release();
         if (!err) {
           res.json({
             message: 'Delete successfully!',
-            bizResult: '0'
+            bizResult: CommonConstants.BizResult.Success
           });
         } else {
           res.json({
-            bizResult: '8',
+            bizResult: CommonConstants.BizResult.Fail,
             errors: err
           });
         }

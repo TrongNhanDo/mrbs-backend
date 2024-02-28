@@ -8,15 +8,11 @@ const roomSchema = new mongoose.Schema(
     },
     sort_key: {
       type: String,
-      require: false
-    },
-    area_id: {
-      type: Number,
-      require: false
+      require: true
     },
     description: {
       type: String,
-      require: false
+      require: true
     },
     capacity: {
       type: Number,
@@ -25,6 +21,11 @@ const roomSchema = new mongoose.Schema(
     room_admin_email: {
       type: String,
       require: true
+    },
+    disabled: {
+      type: Number,
+      require: false,
+      default: 0
     }
   },
   {
