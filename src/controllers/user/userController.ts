@@ -3,10 +3,45 @@ import { Request, Response, query } from 'express';
 import { MysqlError, PoolConnection } from 'mysql';
 import dbConnect from '../../config/poolConnection';
 import * as CommonTypes from '../../common/types';
+import * as CommonConstants from '../../common/constants';
 import * as Types from './types';
 import * as Constants from '../../common/constants';
+import userModel from '../../models/user';
 
 const getUsers = (req: Request, res: Response) => {
+  try {
+    const dbMode = process.env.DB_MODE || CommonConstants.DbTypes.MongoDB;
+    if (dbMode === CommonConstants.DbTypes.MongoDB) {
+      return getUserMongodb(req, res);
+    }
+
+    return getUserMySql(req, res);
+  } catch (err) {
+    throw err;
+  }
+};
+
+const getUserMongodb = async (req: Request, res: Response) => {
+  try {
+    const users = await userModel.find();
+    if (!users || !users.length) {
+      return res.json({
+        bizResult: Constants.BizResult.Fail,
+        errors: []
+      });
+    }
+
+    return res.json({
+      users,
+      bizResult: Constants.BizResult.Success,
+      errors: []
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getUserMySql = (req: Request, res: Response) => {
   try {
     dbConnect.getConnection((err: MysqlError, connection: PoolConnection) => {
       if (err) throw err;

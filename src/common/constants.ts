@@ -19,3 +19,8 @@ export enum DayOfWeekTypes {
   Saturday = 'SA',
   Sunday = 'SU'
 }
+
+export enum DbTypes {
+  MongoDB = 'mongodb',
+  MySQL = 'mysql'
+}
