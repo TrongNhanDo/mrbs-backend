@@ -108,17 +108,19 @@ const updateUser = (req: Request, res: Response) => {
       if (err) throw err;
 
       const params: Types.UpdateUserProps = req.body;
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.json({
+          bizResult: Constants.BizResult.Fail,
+          errors: errors.array()
+        });
+      }
+
       const query =
-        'UPDATE mrbs_users SET level = ?, display_name = ?, password_hash = ?, email = ? WHERE id = ?';
+        'UPDATE mrbs_users SET level = ?, display_name = ?, email = ? WHERE id = ?';
       connection.query(
         query,
-        [
-          params.level,
-          params.display_name,
-          params.password_hash,
-          params.email,
-          params.id
-        ],
+        [params.level, params.display_name, params.email, params.id],
         (err) => {
           if (!err) {
             connection.release();
@@ -143,11 +145,57 @@ const updateUser = (req: Request, res: Response) => {
   }
 };
 
-const deleteUser = (req: Request, res: Response) => {
+const changePassword = (req: Request, res: Response) => {
   try {
-    const params: Types.DeleteUserProps = req.body;
     dbConnect.getConnection((err, connection) => {
       if (err) throw err;
+
+      const params: Types.ChangePwdProps = req.body;
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.json({
+          bizResult: Constants.BizResult.Fail,
+          errors: errors.array()
+        });
+      }
+
+      const query = 'UPDATE mrbs_users SET password_hash = ? WHERE id = ?';
+      connection.query(query, [params.password_hash, params.id], (err) => {
+        if (!err) {
+          connection.release();
+          const response: CommonTypes.ResponseProps = {
+            errors: [],
+            bizResult: Constants.BizResult.Success
+          };
+          return res.json(response);
+        } else {
+          connection.rollback();
+          const response: CommonTypes.ResponseProps = {
+            errors: [err],
+            bizResult: Constants.BizResult.Fail
+          };
+          return res.json(response);
+        }
+      });
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
+const deleteUser = (req: Request, res: Response) => {
+  try {
+    dbConnect.getConnection((err, connection) => {
+      if (err) throw err;
+
+      const params: Types.DeleteUserProps = req.body;
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.json({
+          bizResult: Constants.BizResult.Fail,
+          errors: errors.array()
+        });
+      }
 
       const query = 'DELETE FROM mrbs_users WHERE id = ?';
       connection.query(query, [params.id], (err) => {
@@ -177,5 +225,6 @@ export default {
   getUsers,
   addUser,
   updateUser,
+  changePassword,
   deleteUser
 };

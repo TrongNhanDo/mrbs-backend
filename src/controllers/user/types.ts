@@ -17,6 +17,11 @@ export type UpdateUserProps = {
   email: string;
 };
 
+export type ChangePwdProps = {
+  id: number;
+  password_hash: string;
+};
+
 export type DeleteUserProps = {
   id: number;
 };
