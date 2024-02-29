@@ -24,6 +24,16 @@ const userSchema = new mongoose.Schema(
     },
     last_login: {
       type: Number,
+      require: true,
+      default: 0
+    },
+    reset_key_hash: {
+      type: String,
+      require: false
+    },
+    reset_key_expiry: {
+      type: Number,
+      require: false,
       default: 0
     }
   },

@@ -33,10 +33,11 @@ export type UserProps = {
   display_name: string;
   password_hash: string;
   email: string;
-  timestamp: string;
   last_login: number;
   reset_key_hash: string;
   reset_key_expiry: number;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type ResponseGetAllUsersProps = {
@@ -46,4 +47,9 @@ export type ResponseGetAllUsersProps = {
 
 export type GetUserByIdProps = {
   userId: number;
+};
+
+export type UsersPanigateProps = {
+  perPage: number;
+  page: number;
 };

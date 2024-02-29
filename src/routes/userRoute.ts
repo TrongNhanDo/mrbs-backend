@@ -4,16 +4,25 @@ import {
   validationAddUser,
   validationChangePwd,
   validationDeleteUser,
+  validationGetUserById,
+  validationGetUsersPanigate,
   validationUpdateUser
 } from '../controllers/user/validations';
 
 const userRoute = express.Router();
 
 /** get user by id */
-userRoute.route('/:userId').get(userController.getUserById);
+userRoute.get('/:id', validationGetUserById, userController.getUserById);
 
 /** get all users */
-userRoute.route('/').get(userController.getUsers);
+userRoute.get('/', userController.getUsers);
+
+/** get all users with panigate */
+userRoute.post(
+  '/get-users-panigate',
+  validationGetUsersPanigate,
+  userController.getUsersPanigate
+);
 
 /** add user */
 userRoute.post('/', validationAddUser, userController.addUser);

@@ -1,4 +1,14 @@
-import { body } from 'express-validator';
+import { body, param } from 'express-validator';
+import { Types } from 'mongoose';
+
+export const validationGetUserById = [
+  param('id')
+    .notEmpty()
+    .withMessage('The id field is a required field.')
+    .if((value) => value !== undefined)
+    .custom((value) => Types.ObjectId.isValid(value))
+    .withMessage('The id field must be of ObjectID data type.')
+];
 
 /** validation for adding new user */
 export const validationAddUser = [
@@ -38,6 +48,21 @@ export const validationAddUser = [
     .if((value) => value !== undefined)
     .isInt()
     .withMessage('The last_login field must be string.')
+];
+
+export const validationGetUsersPanigate = [
+  body('perPage')
+    .notEmpty()
+    .withMessage('The perPage field is a required field.')
+    .if((value) => value !== undefined)
+    .isInt()
+    .withMessage('The perPage field must be number.'),
+  body('page')
+    .notEmpty()
+    .withMessage('The page field is a required field.')
+    .if((value) => value !== undefined)
+    .isInt()
+    .withMessage('The page field must be number.')
 ];
 
 /**validation for updating user */

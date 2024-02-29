@@ -2,7 +2,7 @@ import { validationResult } from 'express-validator';
 import { Request, Response, query } from 'express';
 import { MysqlError, PoolConnection } from 'mysql';
 import md5 from 'md5';
-import dbConnect from '../../config/poolConnection';
+// import dbConnect from '../../config/poolConnection';
 import * as CommonTypes from '../../common/types';
 import * as Types from './types';
 import * as CommonConstants from '../../common/constants';
@@ -10,7 +10,7 @@ import userModel from '../../models/user';
 
 const getUsers = async (req: Request, res: Response) => {
   try {
-    const users = await userModel.find();
+    const users = await userModel.find().exec();
     if (users && users.length >= 0) {
       return res.json({
         users,
@@ -28,10 +28,63 @@ const getUsers = async (req: Request, res: Response) => {
   }
 };
 
+const getUsersPanigate = async (req: Request, res: Response) => {
+  try {
+    const errValidate = validationResult(req);
+    if (!errValidate.isEmpty()) {
+      return res.json({
+        bizResult: CommonConstants.BizResult.Fail,
+        errors: errValidate.array()
+      });
+    }
+
+    const request: Types.UsersPanigateProps = req.body;
+    const allUsers = await userModel.find().exec();
+    const usersPaginate = await userModel
+      .find()
+      .select('-password_hash')
+      .sort({ createdAt: 1 })
+      .skip(request.perPage * (request.page || 1) - request.perPage)
+      .limit(request.perPage)
+      .exec();
+
+    if (
+      usersPaginate &&
+      usersPaginate.length >= 0 &&
+      allUsers &&
+      allUsers.length >= 0
+    ) {
+      return res.json({
+        countCnt: allUsers.length || 0,
+        returnCnt: usersPaginate.length || 0,
+        totalPage: Math.ceil(allUsers.length / request.perPage) || 0,
+        users: usersPaginate,
+        bizResult: CommonConstants.BizResult.Success,
+        errors: []
+      });
+    }
+
+    return res.json({
+      bizResult: CommonConstants.BizResult.Fail,
+      errors: []
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
 const getUserById = async (req: Request, res: Response) => {
   try {
-    const { userId } = req.params;
-    const users = await userModel.findById(userId);
+    const errValidate = validationResult(req);
+    if (!errValidate.isEmpty()) {
+      return res.json({
+        bizResult: CommonConstants.BizResult.Fail,
+        errors: errValidate.array()
+      });
+    }
+
+    const { id } = req.params;
+    const users = await userModel.findById(id).exec();
     if (users) {
       return res.json({
         users,
@@ -460,6 +513,7 @@ const deleteUser = async (req: Request, res: Response) => {
 
 export default {
   getUsers,
+  getUsersPanigate,
   getUserById,
   addUser,
   updateUser,
