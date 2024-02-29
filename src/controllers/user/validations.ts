@@ -97,8 +97,8 @@ export const validationUpdateUser = [
     .notEmpty()
     .withMessage('The id field is a required field.')
     .if((value) => value !== undefined)
-    .isString()
-    .withMessage('The id field must be string.')
+    .custom((value) => Types.ObjectId.isValid(value))
+    .withMessage('The id field must be of ObjectID data type.')
 ];
 
 /** validation for changing password */
@@ -107,8 +107,8 @@ export const validationChangePwd = [
     .notEmpty()
     .withMessage('The id field is a required field.')
     .if((value) => value !== undefined)
-    .isString()
-    .withMessage('The id field must be a string'),
+    .custom((value) => Types.ObjectId.isValid(value))
+    .withMessage('The id field must be of ObjectID data type.'),
   body('password_hash')
     .notEmpty()
     .withMessage('The id field is a required field.')
@@ -123,6 +123,6 @@ export const validationDeleteUser = [
     .notEmpty()
     .withMessage('The id field is a required field.')
     .if((value) => value !== undefined)
-    .isString()
-    .withMessage('The id field must be a string')
+    .custom((value) => Types.ObjectId.isValid(value))
+    .withMessage('The id field must be of ObjectID data type.')
 ];

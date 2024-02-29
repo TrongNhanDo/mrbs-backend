@@ -7,11 +7,12 @@ import * as CommonTypes from '../../common/types';
 import * as Types from './types';
 import * as CommonConstants from '../../common/constants';
 import userModel from '../../models/user';
+import { isEqualObjectId } from '../../common/utils';
 
 const getUsers = async (req: Request, res: Response) => {
   try {
-    const users = await userModel.find().exec();
-    if (users && users.length >= 0) {
+    const users = await userModel.find().select('-password_hash').exec();
+    if (users) {
       return res.json({
         users,
         bizResult: CommonConstants.BizResult.Success,
@@ -21,7 +22,7 @@ const getUsers = async (req: Request, res: Response) => {
 
     return res.json({
       bizResult: CommonConstants.BizResult.Fail,
-      errors: []
+      errors: [{ message: "Server's error" }]
     });
   } catch (error) {
     throw error;
@@ -265,10 +266,8 @@ const updateUser = async (req: Request, res: Response) => {
       });
     }
 
-    const duplicate = await userModel
-      .findOne({ name: params.name, id: { $not: { $gt: params.id } } })
-      .exec();
-    if (duplicate) {
+    const duplicate = await userModel.findOne({ name: params.name }).exec();
+    if (duplicate && isEqualObjectId(duplicate._id, user._id)) {
       return res.json({
         errors: [{ message: 'name already existed' }],
         bizResult: CommonConstants.BizResult.Fail

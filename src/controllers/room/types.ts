@@ -20,3 +20,8 @@ export type UpdateRoomProps = {
 export type DeleteRoomProps = {
   id: string;
 };
+
+export type GetRoomsPaginate = {
+  perPage: number;
+  page: number;
+};

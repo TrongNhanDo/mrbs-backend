@@ -1,4 +1,5 @@
 import { body } from 'express-validator';
+import { Types } from 'mongoose';
 
 /** validation for adding new room */
 export const validationAddRoom = [
@@ -6,8 +7,8 @@ export const validationAddRoom = [
     .notEmpty()
     .withMessage('The id field is a required field.')
     .if((value) => value !== undefined)
-    .isString()
-    .withMessage('The id field must be string.'),
+    .custom((value) => Types.ObjectId.isValid(value))
+    .withMessage('The id field must be of ObjectID data type.'),
   body('room_name')
     .notEmpty()
     .withMessage('The room_name field is a required field.')
@@ -50,8 +51,8 @@ export const validationUpdateRoom = [
     .notEmpty()
     .withMessage('The id field is a required field.')
     .if((value) => value !== undefined)
-    .isString()
-    .withMessage('The id field must be string.'),
+    .custom((value) => Types.ObjectId.isValid(value))
+    .withMessage('The id field must be of ObjectID data type.'),
   body('room_name')
     .notEmpty()
     .withMessage('The room_name field is a required field.')
@@ -94,6 +95,15 @@ export const validationDeleteRoom = [
     .notEmpty()
     .withMessage('The id field is a required field.')
     .if((value) => value !== undefined)
-    .isString()
-    .withMessage('The id field must be a string')
+    .custom((value) => Types.ObjectId.isValid(value))
+    .withMessage('The id field must be of ObjectID data type.')
+];
+
+export const validationGetRoomById = [
+  body('id')
+    .notEmpty()
+    .withMessage('The id field is a required field.')
+    .if((value) => value !== undefined)
+    .custom((value) => Types.ObjectId.isValid(value))
+    .withMessage('The id field must be of ObjectID data type.')
 ];

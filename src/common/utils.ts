@@ -1,4 +1,5 @@
 import * as DateFns from 'date-fns';
+import { Types } from 'mongoose';
 import * as Constants from '../common/constants';
 
 export const checkEmpty = (value: any) => {
@@ -147,4 +148,11 @@ export const isEqualDate = (
   dateCompare: string | Date | number
 ) => {
   return new Date(date) === new Date(dateCompare);
+};
+
+export const isEqualObjectId = (
+  id1: Types.ObjectId | string,
+  id2: Types.ObjectId | string
+) => {
+  return id1.toString() === id2.toString();
 };
